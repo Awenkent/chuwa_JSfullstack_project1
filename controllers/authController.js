@@ -1,26 +1,25 @@
-const Employee = require('../models/employeeModel');
-const {CustomAPIError} = require('../errors');
+const Users = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env' })
 
 const doLogin = async (req, res, next) => {
     try {
-      const { firstName,password} = req.body;
+      const { userName,password} = req.body;
   
-      let user = await Employee.findOne({ firstName: firstName });
+      let user = await Users.findOne({ userName });
   
       if (!user) {
-        throw new CustomAPIError('Invalid Credentials(User does not exist)', 400);
+        return res.status(400).json({messgae:'Invalid Credentials(User does not exist)'});
       }
   
       if (user.password !== password) {
-        throw new CustomAPIError('Invalid Credentials(Passwod incorrect)', 400);
+        return res.status(400).json({messgae:'Invalid Credentials(Passwod incorrect)'});
       }
   
       const payload = {
         user: {
           id: user._id,
-          companyId: user.cart
+          userName:user.userName
         }
       };
 
