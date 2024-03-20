@@ -24,7 +24,7 @@ const getOneProduct = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("password");
+    const user = await User.findById(req.id);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
@@ -44,10 +44,11 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("password");
+    const user = await User.findById(req.id);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
+    console.log(user.role);
     if (user.role !== "Admin") {
       return res
         .status(403)
@@ -63,7 +64,7 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("password");
+    const user = await User.findById(req.id);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
