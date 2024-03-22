@@ -2,15 +2,15 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 // const { errorHandler } = require("../middlewares/errorHandler");
 
-const getAllProducts = async (req, res, next) => {
-  try {
-    const products = await Product.find();
-    res.status(200).json(products);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: "Error on getting all products" });
-  }
-};
+// const getAllProducts = async (req, res) => {
+//   try {
+//     const products = await Product.find();
+//     res.status(200).json(products);
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).json({ message: "Error on getting all products" });
+//   }
+// };
 
 const getOneProduct = async (req, res) => {
   try {
@@ -84,10 +84,45 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const getProducts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 8;
+  //const limit = 2;
+  //console.log(page, limit);
+  const result = {};
+
+  startIndex = (page - 1) * limit;
+  endIndex = page * limit;
+
+  if (startIndex > 0) {
+    result.previous = {
+      page: page - 1,
+      limit: limit,
+    };
+  }
+
+  if (endIndex < (await Product.countDocuments().exec())) {
+    result.next = {
+      page: page + 1,
+      limit: limit,
+    };
+  }
+
+  try {
+    result.results = await Product.find().limit(limit).skip(startIndex).exec();
+    res.paginatedResults = result;
+    res.status(200).json(result);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ Message: "No results found on current page" });
+  }
+};
+
 module.exports = {
-  getAllProducts,
+  // getAllProducts,
   getOneProduct,
   createProduct,
   updateProduct,
   deleteProduct,
+  getProducts,
 };
