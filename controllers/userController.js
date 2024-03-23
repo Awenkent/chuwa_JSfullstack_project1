@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Product = require("../models/productModel");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -13,7 +14,15 @@ const getAllUsers = async (req, res) => {
 const getCartFromUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.id);
-    res.status(200).json(user.shoppingCart);
+    const cartPromises = user.shoppingCart.map((item)=>{
+      return Product.findById(item).then((product)=>product)
+    })
+   
+    Promise.all(cartPromises).then((shoppingCart)=>{
+    
+      res.status(200).json(shoppingCart);
+    })
+   
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ message: "Server Error" });
@@ -22,9 +31,21 @@ const getCartFromUser = async (req, res, next) => {
 
 const getOneUser = async (req, res) => {
   try {
-    const user = await User.findById(req.id);
-    res.status(200).json(user);
+    const user = await User.findById(req.id).select(["userName","shoppingCart","role"]);
+    const cartPromises = user.shoppingCart.map((item)=>{
+      return Product.findById(item).then((product)=>product)
+    })
+ 
+    Promise.all(cartPromises).then((shoppingCart)=>{
+   
+      let obj = {...(user._doc)}
+      obj.shoppingCart = shoppingCart
+   
+      res.status(200).json(obj);
+    })
+   
   } catch (err) {
+    console.log(err)
     res.status(500).json({ message: "Server Error" });
   }
 };
@@ -46,8 +67,20 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.id, req.body);
-    res.status(200).json(user);
+    
+    const user = await User.findByIdAndUpdate(req.id, req.body,{new: true});
+
+    const cartPromises = user.shoppingCart.map((item)=>{
+      return Product.findById(item).then((product)=>product)
+    })
+ 
+    Promise.all(cartPromises).then((shoppingCart)=>{
+   
+      let obj = {...(user._doc)}
+      obj.shoppingCart = shoppingCart
+      res.status(200).json(obj);
+    })
+  
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }

@@ -1,0 +1,13 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+footer div a {
+  margin: 0 5px;
+}
+.icon {
+  position: relative;
+  /* Adjust these values accordingly */
+  top: 4px;
+  left: 5px;
+}
