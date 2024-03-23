@@ -86,31 +86,29 @@ const deleteProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 8;
-  //const limit = 2;
-  //console.log(page, limit);
-  const result = {};
+  const limit = parseInt(req.query.limit) || 10;
+  // console.log(page, limit);
+  // const result = {};
 
   startIndex = (page - 1) * limit;
   endIndex = page * limit;
 
-  if (startIndex > 0) {
-    result.previous = {
-      page: page - 1,
-      limit: limit,
-    };
-  }
+  // if (startIndex > 0) {
+  //   result.previous = {
+  //     page: page - 1,
+  //     limit: limit,
+  //   };
+  // }
 
-  if (endIndex < (await Product.countDocuments().exec())) {
-    result.next = {
-      page: page + 1,
-      limit: limit,
-    };
-  }
+  // if (endIndex < (await Product.countDocuments().exec())) {
+  //   result.next = {
+  //     page: page + 1,
+  //     limit: limit,
+  //   };
+  // }
 
   try {
-    result.results = await Product.find().limit(limit).skip(startIndex).exec();
-    res.paginatedResults = result;
+    result = await Product.find().limit(limit).skip(startIndex).exec();
     res.status(200).json(result);
   } catch (e) {
     console.error(e);
