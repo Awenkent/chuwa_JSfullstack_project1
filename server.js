@@ -1,10 +1,12 @@
 const express = require("express");
 const connectDB = require("./db");
 const app = express();
-const port = 3000;
+const cors = require("cors");
+const port = 4000;
 const userRouter = require("./routers/userRouter");
 const productRouter = require("./routers/productRouter");
 connectDB();
+app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/user", userRouter);
