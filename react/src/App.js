@@ -7,6 +7,7 @@ import Home from "./components/home";
 import Auth from "./components/auth";
 import Error from "./components/error";
 import ProductManage from "./components/productManage";
+import CartApp from "./components/cartApp"
 export default function App() {
 
 
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/signin" element={<Auth case="signin" />} />
         <Route path="/productmanage" element={<ProductManage />} />
+        <Route path="/cart" element={<CartApp />} />
         <Route path="*" element={<Error />} />
       </Routes>
 

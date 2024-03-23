@@ -1,23 +1,33 @@
-import { Badge, Drawer, Grid, LinearProgress } from "@material-ui/core";
-import { AddShoppingCart } from "@material-ui/icons";
-import { useState } from "react";
-import { useQuery } from "react-query";
-import { Wrapper, StyledButton } from "./cartApp.styles";
-import Product from "./product";
-import Cart from "./cart";
-import "./styles.css";
+import React, { useState, useEffect } from 'react';
+import { Badge, Drawer, Grid, LinearProgress } from '@material-ui/core';
+import { AddShoppingCart } from '@material-ui/icons';
+import axios from 'axios';
+import { Wrapper, StyledButton } from './cartApp.styles';
+import Product from './product';
+import Cart from './cart';
+import './styles.css';
 
-const getProducts = async () => {
-  const response = await fetch("https://fakestoreapi.com/products");
-  const data = await response.json();
-  return data;
-};
-
-export default function CartApp() {
+const CartApp = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const { data, isLoading, error } = useQuery("products", getProducts);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/product');
+        setProducts(response.data);
+        setIsLoading(false);
+      } catch (error) {
+        setError('Error fetching data');
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const getTotalItems = (items) =>
     items.reduce((acc, item) => acc + item.amount, 0);
@@ -52,7 +62,7 @@ export default function CartApp() {
   };
 
   if (isLoading) return <LinearProgress />;
-  if (error) return <div>Something went wrong</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <Wrapper>
@@ -71,13 +81,14 @@ export default function CartApp() {
       </StyledButton>
 
       <Grid container spacing={3}>
-        {data &&
-          data.map((item) => (
-            <Grid item key={item.id} xs={12} sm={4}>
-              <Product/>
-            </Grid>
-          ))}
+        {products.map((product) => (
+          <Grid item key={product.id} xs={12} sm={4}>
+            <Product product={product} addToCart={handleAddToCart} />
+          </Grid>
+        ))}
       </Grid>
     </Wrapper>
   );
-}
+};
+
+export default CartApp;
