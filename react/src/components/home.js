@@ -124,7 +124,7 @@ export default function Home() {
     dispatch(fetchProducts());
     dispatch(fetchUser());
   }, []);
-  console.log(products)
+  console.log(user)
   return (
      
     <div>

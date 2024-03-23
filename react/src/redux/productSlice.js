@@ -28,11 +28,9 @@ export const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        // Add any fetched posts to the array
         
-    
+        // Add any fetched posts to the array
         state.products = action.payload
-       
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = 'failed'

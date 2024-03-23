@@ -9,10 +9,10 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   setUser,
   setCart,
-  selectUsername,
+
   selectCart,
-  selectRole,
-  selectTotalPrice,
+
+  updateUser,
   selectUser,
 } from "../redux/userSlice";
 
@@ -21,7 +21,12 @@ export default function Product(props) {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const handleAddToCart = (e)=>{
-    dispatch(setCart([...cart,props.productObject]))
+    let userObj = {
+      ...user,
+      shoppingCart : [...cart,props.productObject]
+    }
+    dispatch(updateUser(userObj))
+  
     console.log("handleAddToCart()")
  
   }
