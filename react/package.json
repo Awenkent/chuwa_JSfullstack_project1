@@ -7,7 +7,7 @@
     "react",
     "starter"
   ],
-  "main": "src/index.tsx",
+  "main": "src/index.js",
   "dependencies": {
     "loader-utils": "3.2.1",
     "react": "18.2.0",
