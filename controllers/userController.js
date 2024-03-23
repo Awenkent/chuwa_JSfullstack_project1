@@ -17,9 +17,9 @@ const getCartFromUser = async (req, res, next) => {
     const cartPromises = user.shoppingCart.map((item)=>{
       return Product.findById(item).then((product)=>product)
     })
-    console.log(cartPromises)
+   
     Promise.all(cartPromises).then((shoppingCart)=>{
-      console.log(shoppingCart)
+    
       res.status(200).json(shoppingCart);
     })
    
@@ -35,12 +35,12 @@ const getOneUser = async (req, res) => {
     const cartPromises = user.shoppingCart.map((item)=>{
       return Product.findById(item).then((product)=>product)
     })
-    console.log(cartPromises)
+ 
     Promise.all(cartPromises).then((shoppingCart)=>{
-      console.log(shoppingCart)
+   
       let obj = {...(user._doc)}
       obj.shoppingCart = shoppingCart
-      console.log(obj)
+   
       res.status(200).json(obj);
     })
    
@@ -68,8 +68,19 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     
-    const user = await User.findByIdAndUpdate(req.id, req.body);
-    res.status(200).json(user);
+    const user = await User.findByIdAndUpdate(req.id, req.body,{new: true});
+
+    const cartPromises = user.shoppingCart.map((item)=>{
+      return Product.findById(item).then((product)=>product)
+    })
+ 
+    Promise.all(cartPromises).then((shoppingCart)=>{
+   
+      let obj = {...(user._doc)}
+      obj.shoppingCart = shoppingCart
+      res.status(200).json(obj);
+    })
+  
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }

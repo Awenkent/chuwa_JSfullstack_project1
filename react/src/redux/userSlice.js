@@ -47,9 +47,24 @@ export const fetchUser = createAsyncThunk('user/fetchUsers', async () => {
         role: "Regular",
       };
     }
-    
- 
 })
+
+export const updateUser = createAsyncThunk('product/updateUser', async (user) => {
+  const token = localStorage.getItem("token");
+  const response = fetch("http://localhost:4000/user",{
+    method:'PUT',
+    headers:{
+      'Authorization' : `Bearer ${token}`,
+      'Content-Type':'application/json;charset=UTF-8',
+  },
+    body: JSON.stringify(user),
+    mode:'cors',
+    cache:'default'
+  }) .then((response) => response.json())
+  return response;
+})
+
+
 const defaultState = {
   userName: null,
   shoppingCart: [],
@@ -101,6 +116,23 @@ export const userSlice = createSlice({
        
       })
       .addCase(fetchUser.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message
+        console.log( action.error.message)
+      })
+      .addCase(updateUser.pending, (state, action) => {
+        state.status = 'loading'
+        console.log('updating user')
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        console.log(action)
+        state.shoppingCart = action.payload.shoppingCart;
+        state.totalPrice = action.payload.shoppingCart.reduce((currentPrice, product) => {
+          return currentPrice + Number(product.price);
+        }, 0); 
+       
+      })
+      .addCase(updateUser.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
         console.log( action.error.message)
