@@ -41,7 +41,13 @@ export default function Product(props) {
         break;
       }
     }
-  
+
+    let userObj = {
+      ...user,
+      shoppingCart : [...array]
+    }
+   
+    dispatch(updateUser(userObj))
     console.log("handleRemoveFromCart()")
     
   }

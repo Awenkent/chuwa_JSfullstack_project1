@@ -5,12 +5,36 @@ export const fetchProducts = createAsyncThunk('product/fetchProducts', async () 
   .then((response) => response.json())
   return response;
 })
+
+export const createProduct = createAsyncThunk('product/createUser', async (product) => {
+  const token = localStorage.getItem("token");
+  const response = fetch("http://localhost:4000/product",{
+    method:'POST',
+    headers:{
+      'Authorization' : `Bearer ${token}`,
+      'Content-Type':'application/json;charset=UTF-8',
+  },
+    body: JSON.stringify(product),
+    mode:'cors',
+    cache:'default'
+  }) .then((response) =>
+  {
+    if(response.ok) {
+      return response.json
+    }
+    else
+    {
+      return response.text().then(text => { throw new Error(text) });
+    }
+  }) 
+  return response;
+})
+
 export const productSlice = createSlice({
   name: "product",
   initialState: {
     products: []
   },
-
   reducers: {
     setProducts: (state, action) => {
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
@@ -33,6 +57,21 @@ export const productSlice = createSlice({
         state.products = action.payload
       })
       .addCase(fetchProducts.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message
+        console.log( action.error.message)
+      })
+      .addCase(createProduct.pending, (state, action) => {
+        state.status = 'loading'
+        console.log('loading products')
+      })
+      .addCase(createProduct.fulfilled, (state, action) => {
+        state.status = 'succeeded'  
+        console.log(action)      
+        // Add any fetched posts to the array
+        state.products.push(action.payload)
+      })
+      .addCase(createProduct.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
         console.log( action.error.message)

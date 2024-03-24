@@ -7,6 +7,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Pagination from "@mui/material/Pagination";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   setUser,
@@ -19,7 +20,7 @@ import {
 } from "../redux/userSlice";
 import {
   setProducts,
- 
+  createProduct,
   fetchProducts,
   selectProducts,
 } from "../redux/productSlice";
@@ -32,7 +33,7 @@ export default function Home() {
   const cart = useSelector(selectCart);
   const products = useSelector(selectProducts);
   const user = useSelector(selectUser);
-
+  const navigate = useNavigate();
   const minMatches = useMediaQuery("(min-width:800px)");
   const middleMatches = useMediaQuery("(min-width:600px)");
   const maxMatches = useMediaQuery("(min-width:400px)");
@@ -154,8 +155,7 @@ export default function Home() {
           ))}
         </TextField>
         <Button
-          onClick={() =>
-            dispatch(fetchUser())
+          onClick={()=>{navigate("/productManage")}
           }
         >
           Add Product
