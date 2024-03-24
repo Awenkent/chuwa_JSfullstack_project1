@@ -15,6 +15,7 @@ export default function App() {
     <div className="App" style={{ backgroundColor: "rgb(235,235,235)" }}>
       <Header
       ></Header>
+      <CartApp/>
 
       <Routes>
         <Route path="/signup" element={<Auth case="signup" />} />

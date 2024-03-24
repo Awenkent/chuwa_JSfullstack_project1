@@ -30,7 +30,7 @@ const CartItem = ({ item, addToCart, removeFromCart }) => {
           </Button>
         </div>
       </div>
-      <img src={item.image} alt={item.title} />
+      <img src={item.imageLink} alt={item.productName} />
     </Wrapper>
   );
 };

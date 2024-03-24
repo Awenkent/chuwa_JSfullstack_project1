@@ -3,22 +3,37 @@ import { Badge, Drawer, Grid, LinearProgress } from '@material-ui/core';
 import { AddShoppingCart } from '@material-ui/icons';
 import axios from 'axios';
 import { Wrapper, StyledButton } from './cartApp.styles';
-import Product from './product';
 import Cart from './cart';
 import './styles.css';
 
 const CartApp = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
-  const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/product');
-        setProducts(response.data);
+        //const response = await axios.get('http://localhost:4000/user/cart');
+        const response = [
+          {"id": "65f60f5cf03761ec078f3574",
+          "productName": "Apple",
+          "price": "2000",
+          "amount": 5,
+          "imageLink": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202310?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1697230830200",
+          "__v": 0,
+          "description": "Apple"},
+          {"id": "65f9d17dcf96e73a87887a09",
+          "productName": "Bose",
+          "price": "200",
+          "amount": 5,
+          "imageLink": "https://assets.bosecreative.com/transform/2f9ed90d-78da-47be-90e4-b5a9df3395fb/soundlink_mini_silo_1_1280_1280",
+          "__v": 0,
+          "description": "Bose Speaker"}
+        ]
+        //setCartItems(response.data);
+        setCartItems(response)
         setIsLoading(false);
       } catch (error) {
         setError('Error fetching data');
@@ -80,13 +95,6 @@ const CartApp = () => {
         </Badge>
       </StyledButton>
 
-      <Grid container spacing={3}>
-        {products.map((product) => (
-          <Grid item key={product.id} xs={12} sm={4}>
-            <Product product={product} addToCart={handleAddToCart} />
-          </Grid>
-        ))}
-      </Grid>
     </Wrapper>
   );
 };
