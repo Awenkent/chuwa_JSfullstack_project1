@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Badge, Drawer, Grid, LinearProgress } from '@material-ui/core';
-import { AddShoppingCart } from '@material-ui/icons';
-import axios from 'axios';
-import { Wrapper, StyledButton } from './cartApp.styles';
-import Cart from './cart';
-import './styles.css';
+import React, { useState, useEffect } from "react";
+import { Badge, Drawer, Grid, LinearProgress } from "@material-ui/core";
+import { AddShoppingCart } from "@material-ui/icons";
+import selectCart from "../redux/userSlice";
+import axios from "axios";
+const { useSelector } = require("react-redux");
+import { Wrapper, StyledButton } from "./cartApp.styles";
+import Cart from "./cart";
+import "./styles.css";
 
 const CartApp = () => {
   const [cartOpen, setCartOpen] = useState(false);
@@ -15,34 +17,58 @@ const CartApp = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        //const response = await axios.get('http://localhost:4000/user/cart');
-        const response = [
-          {"id": "65f60f5cf03761ec078f3574",
-          "productName": "Apple",
-          "price": "2000",
-          "amount": 5,
-          "imageLink": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202310?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1697230830200",
-          "__v": 0,
-          "description": "Apple"},
-          {"id": "65f9d17dcf96e73a87887a09",
-          "productName": "Bose",
-          "price": "200",
-          "amount": 5,
-          "imageLink": "https://assets.bosecreative.com/transform/2f9ed90d-78da-47be-90e4-b5a9df3395fb/soundlink_mini_silo_1_1280_1280",
-          "__v": 0,
-          "description": "Bose Speaker"}
-        ]
-        //setCartItems(response.data);
-        setCartItems(response)
+        const cart = useSelector(selectCart);
+        const response = [];
+
+        // Create an object to keep track of the frequency of each product ID
+        const frequencyMap = {};
+
+        // Count the frequency of each product ID
+        cart.forEach((productId) => {
+          if (frequencyMap[productId]) {
+            frequencyMap[productId]++;
+          } else {
+            frequencyMap[productId] = 1;
+          }
+        });
+
+        // Iterate through each unique product ID
+        for (const productId of Object.keys(frequencyMap)) {
+          try {
+            const { data: product } = await axios.get(
+              `http://localhost:4000/product/${productId}`
+            );
+
+            // Modify the product object before adding it to the response array
+            const modifiedProduct = {
+              id: product._id, // Change _id to id
+              productName: product.productName,
+              price: product.price,
+              amount: frequencyMap[productId], // Set amount to the frequency
+              imageLink: product.imageLink,
+              description: product.description,
+              __v: product.__v,
+            };
+
+            delete modifiedProduct.quantity; // Remove the quantity attribute
+
+            response.push(modifiedProduct);
+          } catch (error) {
+            console.log("Error at get product from backend:"+error);
+            console.error(`Error fetching product ${productId}:`, error);
+          }
+        }
+
+        setCartItems(response);
         setIsLoading(false);
       } catch (error) {
-        setError('Error fetching data');
+        setError("Error fetching data");
         setIsLoading(false);
       }
     };
 
     fetchProducts();
-  }, []);
+  },[]);
 
   const getTotalItems = (items) =>
     items.reduce((acc, item) => acc + item.amount, 0);
@@ -55,7 +81,7 @@ const CartApp = () => {
         return prev.map((item) =>
           item.id === clickedItem.id
             ? { ...item, amount: item.amount + 1 }
-            : item,
+            : item
         );
       }
 
@@ -72,7 +98,7 @@ const CartApp = () => {
         } else {
           return [...acc, item];
         }
-      }, []),
+      }, [])
     );
   };
 
@@ -94,9 +120,25 @@ const CartApp = () => {
           <AddShoppingCart />
         </Badge>
       </StyledButton>
-
     </Wrapper>
   );
 };
 
 export default CartApp;
+
+/* const response = [
+  {"id": "65f60f5cf03761ec078f3574",
+  "productName": "Apple",
+  "price": "2000",
+  "amount": 5,
+  "imageLink": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202310?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1697230830200",
+  "__v": 0,
+  "description": "Apple"},
+  {"id": "65f9d17dcf96e73a87887a09",
+  "productName": "Bose",
+  "price": "200",
+  "amount": 5,
+  "imageLink": "https://assets.bosecreative.com/transform/2f9ed90d-78da-47be-90e4-b5a9df3395fb/soundlink_mini_silo_1_1280_1280",
+  "__v": 0,
+  "description": "Bose Speaker"}
+] */

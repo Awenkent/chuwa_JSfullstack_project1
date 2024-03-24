@@ -7,15 +7,14 @@ import Home from "./components/home";
 import Auth from "./components/auth";
 import Error from "./components/error";
 import ProductManage from "./components/productManage";
-import CartApp from "./components/cartApp"
+import CartApp from "./components/cartApp";
 export default function App() {
-
-
   return (
     <div className="App" style={{ backgroundColor: "rgb(235,235,235)" }}>
-      <Header
-      ></Header>
-      <CartApp/>
+      <Header></Header>
+    
+      <CartApp />
+    
 
       <Routes>
         <Route path="/signup" element={<Auth case="signup" />} />
