@@ -6,12 +6,12 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate,useLocation } from "react-router-dom";
+
 import {
   setUser,
   setCart,
-
   selectCart,
-
   updateUser,
   selectUser,
 } from "../redux/userSlice";
@@ -19,14 +19,19 @@ import {
 export default function Product(props) {
   const cart = useSelector(selectCart);
   const user = useSelector(selectUser);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleAddToCart = (e)=>{
+    if(Number(props.productObject.quantity) === Number(props.onCart))
+    {
+        alert(props.productObject.productName + "out of stock!");
+        return;
+    }
     let userObj = {
       ...user,
       shoppingCart : [...cart,props.productObject]
     }
-    dispatch(updateUser(userObj))
-  
+    dispatch(updateUser(userObj)) 
     console.log("handleAddToCart()")
  
   }
@@ -41,12 +46,19 @@ export default function Product(props) {
         break;
       }
     }
-  
+
+    let userObj = {
+      ...user,
+      shoppingCart : [...array]
+    }
+   
+    dispatch(updateUser(userObj))
     console.log("handleRemoveFromCart()")
     
   }
   const handleEditProduct = (e)=>{
     console.log("handleEditProduct() at" )
+    navigate("/productManage",{state:{product:props.productObject}})
     console.log(e.target.dataset.productid)
   }
   const handleProductDetail = ()=>{

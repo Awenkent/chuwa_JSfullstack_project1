@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 import {
   setUser,
   fetchUser,
+  setDisplayCart,
+  setDisplayUser,
   selectUsername,
   selectCart,
   selectRole,
@@ -27,6 +29,14 @@ export default function Header(props) {
   const user = useSelector(selectUser);
   const matches = useMediaQuery("(min-width:600px)");
   const navigate = useNavigate();
+  const handleDisplayUser = ()=>{
+    console.log("handleDisplayUser")
+    dispatch(setDisplayUser("block"))
+  }
+  const handleDisplayCart = ()=>{
+    console.log("handleDisplayCart")
+    dispatch(setDisplayCart("block"))
+  }
   const handleSignOut = ()=>
 {
     alert("SignOut Succeeful!");
@@ -47,7 +57,7 @@ export default function Header(props) {
         }}
       >
         <div style={{ flex: 1 }}>
-          <h3>
+        <h3 onClick = {()=>{navigate("/")}}>
             <b>Chuwa</b> <small>Management</small>
           </h3>
         </div>
@@ -78,8 +88,9 @@ export default function Header(props) {
             flexWrap: "nowrap",
           }}
         >
-          <ManageAccountsOutlinedIcon className="icon" fontSize="medium" />
-         
+            <span class="notification">
+          <ManageAccountsOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayUser}/>
+          </span>
           {user.userName !== null?
           (<span style={{ margin: "0 10px" }} onClick={handleSignOut}>
              Sign Out
@@ -90,7 +101,15 @@ export default function Header(props) {
             </span>
             )
           }
-          <ShoppingCartOutlinedIcon className="icon" fontSize="medium" />
+           {user.shoppingCart.length !== 0 ?
+           (  <span class="notification">
+           <ShoppingCartOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayCart}/>
+           <span class="badge">{user.shoppingCart.length}</span>
+         </span>)
+           :
+           (  <ShoppingCartOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayCart}/>)
+          }
+        
           <a style={{ margin: "0 10px" }}> {"$" + totalPrice}</a>
         </div>
       </header>
@@ -110,8 +129,8 @@ export default function Header(props) {
           }}
         >
           <div style={{ flex: 1 }}>
-            <h3>
-              <b>{props.title}</b> <small>{props.subtitle}</small>
+            <h3 onClick = {()=>{navigate("/")}}>
+               <b>Chuwa</b> <small>Management</small>
             </h3>
           </div>
 
