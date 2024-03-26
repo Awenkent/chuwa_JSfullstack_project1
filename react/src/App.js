@@ -7,14 +7,15 @@ import Home from "./components/home";
 import Auth from "./components/auth";
 import Error from "./components/error";
 import ProductManage from "./components/productManage";
-import ProductDetailPage from "./components/productDetails";
 export default function App() {
+
+
   return (
     <div className="App" style={{ backgroundColor: "rgb(235,235,235)" }}>
-      <Header></Header>
+      <Header
+      ></Header>
 
       <Routes>
-        <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/signup" element={<Auth case="signup" />} />
         <Route path="/" element={<Home />} />
         <Route path="/signin" element={<Auth case="signin" />} />
