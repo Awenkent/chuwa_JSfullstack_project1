@@ -1,76 +1,74 @@
-import { createSlice,createAsyncThunk  } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-export const fetchUser = createAsyncThunk('user/fetchUsers', async () => {
-    if(localStorage.getItem("token"))
-    {
-      console.log("founded token")
-          const token = localStorage.getItem("token");
-          const response = await fetch("http://localhost:4000/user/profile",{
-            method:'GET',
-            headers:{
-                'Authorization' : `Bearer ${token}`,
-                'Content-Type':'application/json;charset=UTF-8',
-            },
-            mode:'cors',
-            cache:'default'
-
-          }).then(res => {
-          if(res.ok) {  
-            return res.json()
+export const fetchUser = createAsyncThunk("user/fetchUsers", async () => {
+  if (localStorage.getItem("token")) {
+    console.log("founded token");
+    const token = localStorage.getItem("token");
+    const response = await fetch("http://localhost:4000/user/profile", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json;charset=UTF-8",
+      },
+      mode: "cors",
+      cache: "default",
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
           // handle the response
-          }
-          else if(res.status === 401)
-          {
-             alert("Your session is ended, please login again.");
-             localStorage.removeItem("token");
-             window.location.href = "/";
-          }
-          else
-          {
-              console.log(res.status);
-              return res.text().then(text => { throw new Error(text) });
-          }
-        }) .catch(error => {
-              console.log("The error is: " + error);
-             // alert("Your session is ended, please login again.");
-         });
-         console.log(response)
-         
-         return response;
-    }
-    else
-    {
-      return {
-        userName: null,
-        shoppingCart: [],
-        totalPrice: 0,
-        role: "Regular",
-      };
-    }
-})
+        } else if (res.status === 401) {
+          alert("Your session is ended, please login again.");
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        } else {
+          console.log(res.status);
+          return res.text().then((text) => {
+            throw new Error(text);
+          });
+        }
+      })
+      .catch((error) => {
+        console.log("The error is: " + error);
+        // alert("Your session is ended, please login again.");
+      });
+    console.log(response);
 
-export const updateUser = createAsyncThunk('product/updateUser', async (user) => {
-  const token = localStorage.getItem("token");
-  const response = fetch("http://localhost:4000/user",{
-    method:'PUT',
-    headers:{
-      'Authorization' : `Bearer ${token}`,
-      'Content-Type':'application/json;charset=UTF-8',
-  },
-    body: JSON.stringify(user),
-    mode:'cors',
-    cache:'default'
-  }) .then((response) => response.json())
-  return response;
-})
+    return response;
+  } else {
+    return {
+      userName: null,
+      shoppingCart: [],
+      totalPrice: 0,
+      role: "Regular",
+    };
+  }
+});
 
+export const updateUser = createAsyncThunk(
+  "product/updateUser",
+  async (user) => {
+    const token = localStorage.getItem("token");
+    const response = fetch("http://localhost:4000/user", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json;charset=UTF-8",
+      },
+      body: JSON.stringify(user),
+      mode: "cors",
+      cache: "default",
+    }).then((response) => response.json());
+    return response;
+  }
+);
 
 const defaultState = {
   userName: null,
   shoppingCart: [],
   totalPrice: 0,
   role: "Regular",
-}
+};
 export const userSlice = createSlice({
   name: "user",
   initialState: defaultState,
@@ -84,60 +82,65 @@ export const userSlice = createSlice({
       state.userName = action.payload.userName;
       state.shoppingCart = action.payload.shoppingCart;
       state.role = action.payload.role;
-      state.totalPrice = action.payload.shoppingCart.reduce((currentPrice, product) => {
-        return currentPrice + Number(product.price);
-      }, 0);
+      state.totalPrice = action.payload.shoppingCart.reduce(
+        (currentPrice, product) => {
+          return currentPrice + Number(product.price);
+        },
+        0
+      );
     },
     setCart: (state, action) => {
       state.shoppingCart = action.payload;
-      
+
       state.totalPrice = action.payload.reduce((currentPrice, product) => {
         return currentPrice + Number(product.price);
       }, 0);
-      
-    }
- 
+    },
   },
   extraReducers(builder) {
     builder
       .addCase(fetchUser.pending, (state, action) => {
-        state.status = 'loading'
-        console.log('loading user')
+        state.status = "loading";
+        console.log("loading user");
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
-        state.status = 'succeeded'    
+        state.status = "succeeded";
         state.userName = action.payload.userName;
         state.shoppingCart = action.payload.shoppingCart;
         state.role = action.payload.role;
-        state.totalPrice = action.payload.shoppingCart.reduce((currentPrice, product) => {
-          return currentPrice + Number(product.price);
-        }, 0);
+        state.totalPrice = action.payload.shoppingCart.reduce(
+          (currentPrice, product) => {
+            return currentPrice + Number(product.price);
+          },
+          0
+        );
         // Add any fetched posts to the array
-       
       })
       .addCase(fetchUser.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.error.message
-        console.log( action.error.message)
+        state.status = "failed";
+        state.error = action.error.message;
+        console.log(action.error.message);
       })
       .addCase(updateUser.pending, (state, action) => {
-        state.status = 'loading'
-        console.log('updating user')
+        state.status = "loading";
+        console.log("updating user");
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        console.log(action)
+        console.log(action);
         state.shoppingCart = action.payload.shoppingCart;
-        state.totalPrice = action.payload.shoppingCart.reduce((currentPrice, product) => {
-          return currentPrice + Number(product.price);
-        }, 0); 
-       
+        state.totalPrice = action.payload.shoppingCart.reduce(
+          (currentPrice, product) => {
+            return currentPrice + Number(product.price);
+          },
+          0
+        );
       })
       .addCase(updateUser.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.error.message
-        console.log( action.error.message)
-      })
-  }
+        state.status = "failed";
+        state.error = action.error.message;
+        console.log(action.error.message);
+      });
+  },
 });
 
 export const { setUser, setCart } = userSlice.actions;
@@ -152,7 +155,6 @@ const incrementAsync = (amount) => (dispatch) => {
   }, 1000);
 };
 
-
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state) => state.counter.value)`
@@ -160,5 +162,5 @@ export const selectUsername = (state) => state.user.name;
 export const selectCart = (state) => state.user.shoppingCart;
 export const selectTotalPrice = (state) => state.user.totalPrice;
 export const selectRole = (state) => state.user.role;
-export const selectUser = (state ) => state.user;
+export const selectUser = (state) => state.user;
 export default userSlice.reducer;

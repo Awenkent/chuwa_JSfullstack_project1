@@ -1,14 +1,18 @@
-import { createSlice,createAsyncThunk  } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-export const fetchProducts = createAsyncThunk('product/fetchProducts', async () => {
-  const response = await fetch("http://localhost:4000/product")
-  .then((response) => response.json())
-  return response;
-})
+export const fetchProducts = createAsyncThunk(
+  "product/fetchProducts",
+  async () => {
+    const response = await fetch("http://localhost:4000/product").then(
+      (response) => response.json()
+    );
+    return response;
+  }
+);
 export const productSlice = createSlice({
   name: "product",
   initialState: {
-    products: []
+    products: [],
   },
 
   reducers: {
@@ -17,30 +21,30 @@ export const productSlice = createSlice({
       // doesn't actually mutate the state because it uses the immer library,
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
-      state.products = action.payload 
+      state.products = action.payload;
     },
   },
   extraReducers(builder) {
     builder
       .addCase(fetchProducts.pending, (state, action) => {
-        state.status = 'loading'
-        console.log('loading products')
+        state.status = "loading";
+        console.log("loading products");
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.status = 'succeeded'
-        
+        state.status = "succeeded";
+
         // Add any fetched posts to the array
-        state.products = action.payload
+        state.products = action.payload;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.error.message
-        console.log( action.error.message)
-      })
-  }
+        state.status = "failed";
+        state.error = action.error.message;
+        console.log(action.error.message);
+      });
+  },
 });
 
-export const { setProducts  } = productSlice.actions;
+export const { setProducts } = productSlice.actions;
 
 // The function below is called a thunk and allows us to perform async logic. It
 // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
@@ -51,7 +55,6 @@ const incrementAsync = (amount) => (dispatch) => {
     dispatch(incrementByAmount(amount));
   }, 1000);
 };
-
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of

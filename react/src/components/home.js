@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {useRef} from 'react';
+import { useRef } from "react";
 import Button from "@mui/material/Button";
 import Product from "./product";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -19,16 +19,14 @@ import {
 } from "../redux/userSlice";
 import {
   setProducts,
- 
   fetchProducts,
   selectProducts,
 } from "../redux/productSlice";
 
-
 export default function Home() {
   const userName = useSelector(selectUsername);
   const totalPrice = useSelector(selectTotalPrice);
-  const role= useSelector(selectRole);
+  const role = useSelector(selectRole);
   const cart = useSelector(selectCart);
   const products = useSelector(selectProducts);
   const user = useSelector(selectUser);
@@ -54,32 +52,35 @@ export default function Home() {
   ];
 
   const dispatch = useDispatch();
-  const handleSort = () =>{
+  const handleSort = () => {
     let sort = sortOptionRef.current.value;
-    switch (sort)
-    {
-      case "LastAdded":
-      {
-        dispatch(setProducts(products.toReversed()))
+    switch (sort) {
+      case "LastAdded": {
+        dispatch(setProducts(products.toReversed()));
         break;
       }
-      case "PriceLowHigh":
-      {
-        dispatch(setProducts(products.toSorted((a,b)=>{
-          
-          return Number(a.price) - Number(b.price);
-        })))
+      case "PriceLowHigh": {
+        dispatch(
+          setProducts(
+            products.toSorted((a, b) => {
+              return Number(a.price) - Number(b.price);
+            })
+          )
+        );
         break;
       }
-      case "PriceHighLow":
-      {
-        dispatch(setProducts(products.toSorted((a,b)=>{
-          return Number(b.price) - Number(a.price);
-        })))
+      case "PriceHighLow": {
+        dispatch(
+          setProducts(
+            products.toSorted((a, b) => {
+              return Number(b.price) - Number(a.price);
+            })
+          )
+        );
         break;
       }
     }
-  }
+  };
   var gridStyle = {};
 
   if (minMatches) {
@@ -124,21 +125,16 @@ export default function Home() {
     dispatch(fetchProducts());
     dispatch(fetchUser());
   }, []);
-  console.log(user)
+  console.log(user);
   return (
-     
     <div>
-       {cart ? cart.map((item, index) => (
-          <div key = {index}>{item._id}</div>
-        )):""}
+      {cart ? cart.map((item, index) => <div key={index}>{item._id}</div>) : ""}
 
       <div style={{ display: "flex" }}>
         <p>currentUser: {user?.userName}</p>
         <p>{"total:" + user?.totalPrice}</p>
         <p>role: {user?.role}</p>
-       
-       
-        
+
         <TextField
           id="outlined-select-currency"
           select
@@ -153,38 +149,40 @@ export default function Home() {
             </MenuItem>
           ))}
         </TextField>
-        <Button
-          onClick={() =>
-            dispatch(fetchUser())
-          }
-        >
-          Add Product
-        </Button>
+        <Button onClick={() => dispatch(fetchUser())}>Add Product</Button>
       </div>
-         
+
       <div style={gridStyle}>
-        {products ? products.map((product, index) => (
-          <Product
-            key={index}
-            productObject = {product}
-            productId = {product._id}
-            productName={product.productName}
-            price={product.price}
-            onCart={(user.shoppingCart.filter(item => {
-            return  item._id === product._id
-            })).length}
-            quantity={product.quantity}
-            imageLink={product.imageLink}
-            description={product.description}
-          ></Product>
-        )):""}
+        {products
+          ? products.map((product, index) => (
+              <Product
+                key={index}
+                productObject={product}
+                productId={product._id}
+                productName={product.productName}
+                price={product.price}
+                onCart={
+                  user.shoppingCart.filter((item) => {
+                    return item._id === product._id;
+                  }).length
+                }
+                quantity={product.quantity}
+                imageLink={product.imageLink}
+                description={product.description}
+              ></Product>
+            ))
+          : ""}
       </div>
 
       <Pagination
         count={10}
         variant="outlined"
         shape="rounded"
-        sx={{marginRight:"20px", display : "flex", justifyContent:"flex-end"}}
+        sx={{
+          marginRight: "20px",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
       />
     </div>
   );
