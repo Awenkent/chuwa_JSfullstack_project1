@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import {useRef} from 'react';
+import { useRef } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
@@ -19,9 +19,7 @@ export default function auth(props) {
   const passwordRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (
-    event
-  ) => {
+  const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
   const navigate = useNavigate();
@@ -62,76 +60,78 @@ export default function auth(props) {
       },
     },
   }));
-  const handleSignup = ()=>{
+  const handleSignup = () => {
     let username = usernameRef.current.value;
     let password = passwordRef.current.value;
     let data = {
-      "userName": username,
-      "password": password,
-      "role": "Regular"
-    }
-    fetch("http://localhost:4000/user/signup",{
-      method:'POST',
-      headers:{
-          'Content-Type':'application/json;charset=UTF-8',
+      userName: username,
+      password: password,
+      role: "Regular",
+    };
+    fetch("http://localhost:4000/user/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8",
       },
       body: JSON.stringify(data),
-      mode:'cors',
-      cache:'default'
-    }).then(res => {
-      if(res.ok) {
-        alert("Your account has been created, please varify the email address before login.");
-        navigate("/signin");
-      }
-      else
-      {
-        return res.text().then(text => { throw new Error(text) });
-      }
+      mode: "cors",
+      cache: "default",
     })
-     .catch(error => {
-      alert(error);
-     });
-  }
-  const handleSignin = ()=>{
+      .then((res) => {
+        if (res.ok) {
+          alert(
+            "Your account has been created, please verify the email address before login."
+          );
+          navigate("/signin");
+        } else {
+          return res.text().then((text) => {
+            throw new Error(text);
+          });
+        }
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  };
+  const handleSignin = () => {
     var username = usernameRef.current.value;
     var password = passwordRef.current.value;
     var data = {
-      "userName": username,
-      "password": password,
-    }
-    fetch("http://localhost:4000/user/signin",{
-      method:'POST',
-      headers:{
-          'Content-Type':'application/json;charset=UTF-8',
+      userName: username,
+      password: password,
+    };
+    fetch("http://localhost:4000/user/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8",
       },
       body: JSON.stringify(data),
-      mode:'cors',
-      cache:'default'
-    }).then(res => {
-      if(res.ok) {
-        return res.json() .then(json => {
-          console.log(JSON.stringify(json));
-          localStorage.setItem("token", json.token);
-          localStorage.setItem("email", json.email);
-          alert("Login successful!");
-          navigate("/");
-      })
-      }
-      else
-      {
-        return res.text().then(text => { throw new Error(text) });
-      }
+      mode: "cors",
+      cache: "default",
     })
-     .catch(error => {
-      alert(error);
-     });
-
-  }
- const renderSwitch = (param) => {
+      .then((res) => {
+        if (res.ok) {
+          return res.json().then((json) => {
+            console.log(JSON.stringify(json));
+            localStorage.setItem("token", json.token);
+            localStorage.setItem("email", json.email);
+            alert("Login successful!");
+            navigate("/");
+          });
+        } else {
+          return res.text().then((text) => {
+            throw new Error(text);
+          });
+        }
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  };
+  const renderSwitch = (param) => {
     switch (param) {
       case "signin":
         return (
-          
           <div style={{ padding: "20px 50px" }}>
             <h2>Sign in to your account</h2>
             <form style={{ textAlign: "center" }}>
@@ -147,10 +147,14 @@ export default function auth(props) {
                 }}
               >
                 <FormControl variant="standard" fullWidth>
-                  <InputLabel shrink htmlFor="bootstrap-input" >
+                  <InputLabel shrink htmlFor="bootstrap-input">
                     Username
                   </InputLabel>
-                  <BootstrapInput defaultValue="username" id="password-input" inputRef={usernameRef}/>
+                  <BootstrapInput
+                    defaultValue="username"
+                    id="password-input"
+                    inputRef={usernameRef}
+                  />
                 </FormControl>
                 <FormControl variant="standard" fullWidth>
                   <InputLabel shrink htmlFor="bootstrap-input">
@@ -184,7 +188,13 @@ export default function auth(props) {
                 </Button>
                 <h5 style={{ width: "100%", textAlign: "left" }}>
                   Don't have an account?
-                  <a onClick={()=>{navigate("/signup")}}>signup</a>
+                  <a
+                    onClick={() => {
+                      navigate("/signup");
+                    }}
+                  >
+                    signup
+                  </a>
                 </h5>
               </Box>
             </form>
@@ -220,7 +230,11 @@ export default function auth(props) {
                   <InputLabel shrink htmlFor="bootstrap-input">
                     Username
                   </InputLabel>
-                  <BootstrapInput defaultValue="username" id="password-input" inputRef={usernameRef}/>
+                  <BootstrapInput
+                    defaultValue="username"
+                    id="password-input"
+                    inputRef={usernameRef}
+                  />
                 </FormControl>
                 <FormControl variant="standard" fullWidth>
                   <InputLabel shrink htmlFor="bootstrap-input">
@@ -254,19 +268,31 @@ export default function auth(props) {
                 </Button>
                 <h5 style={{ width: "100%", textAlign: "left" }}>
                   Already have an account?
-                  <a onClick={()=>{navigate("/signin")}}>signin</a>
+                  <a
+                    onClick={() => {
+                      navigate("/signin");
+                    }}
+                  >
+                    signin
+                  </a>
                 </h5>
               </Box>
             </form>
           </div>
         );
-    
+
       default:
         return "Error";
     }
-  }
+  };
   return (
-    <div style={{ maxWidth:"800px", margin:"50px auto", backgroundColor: "white" }}>
+    <div
+      style={{
+        maxWidth: "800px",
+        margin: "50px auto",
+        backgroundColor: "white",
+      }}
+    >
       {renderSwitch(props.case)}
     </div>
   );
