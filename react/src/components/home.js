@@ -17,6 +17,11 @@ import {
   selectRole,
   selectTotalPrice,
   selectUser,
+  selectDisplayUser,
+  selectDisplayCart,
+  setDisplayUser,
+  setDisplayCart,
+  selectWholeUser
 } from "../redux/userSlice";
 import {
   setProducts,
@@ -25,11 +30,102 @@ import {
   selectProducts,
 } from "../redux/productSlice";
 
+function UserCart(props)
+{
+  var map = new Map();
+  var set = new Set();
+  {props.cart?props.cart.map((product, index) => {
 
+    if(map.has(product._id))
+    {
+      map.set(product._id,map.get(product._id) + 1)
+    }
+    else
+    {
+      map.set(product._id, 1)
+    }
+  }):""
+  }
+ 
+  console.log(props.cart)
+  map.forEach((key,value,map)=>
+  {
+    console.log(key + " and " + value)
+  })
+
+
+  return (
+    <div
+      style={{
+        backgroundColor: "white",
+        padding: "50px",
+        maxWidth: "300px",
+        maxHeight: "500px",
+        overflowY:"auto"
+      }}
+    >
+
+        {props.cart?props.cart.map((product, index) => {
+          if(!set.has(product._id))
+          {
+            set.add(product._id)
+            return(
+          <Product
+          key={index}
+          productObject = {product}
+          productId = {product._id}
+          productName={product.productName}
+          price={product.price}
+          category = {product.category}
+          onCart={map.get(product._id)}
+          quantity={product.quantity}
+          imageLink={product.imageLink}
+          description={product.description}
+        ></Product>
+        )
+          }
+        
+        
+        }
+        ):""}
+      <button
+        onClick={() => {
+          props.handleClick();
+        }}
+      >
+        X
+      </button>
+    </div>
+  );
+}
+function UserProfile(props)
+{
+  return (
+    <div
+      style={{
+        backgroundColor: "green",
+        padding: "50px",
+        maxWidth: "300px",
+      }}
+    >
+        <p>currentUser: {props?.userName}</p>
+        <p>{"total:" + props?.totalPrice}</p>
+        <p>role: {props?.role}</p>
+      <button
+        onClick={() => {
+          props.handleClick();
+        }}
+      >
+        X
+      </button>
+    </div>
+  );
+}
 export default function Home() {
   const userName = useSelector(selectUsername);
   const totalPrice = useSelector(selectTotalPrice);
   const role= useSelector(selectRole);
+ 
   const cart = useSelector(selectCart);
   const products = useSelector(selectProducts);
   const user = useSelector(selectUser);
@@ -37,8 +133,10 @@ export default function Home() {
   const minMatches = useMediaQuery("(min-width:800px)");
   const middleMatches = useMediaQuery("(min-width:600px)");
   const maxMatches = useMediaQuery("(min-width:400px)");
-  const [status, setstatus] = useState(false);
+  const displayUser =  useSelector(selectDisplayUser)
+  const displayCart =  useSelector(selectDisplayCart)
   const sortOptionRef = useRef();
+  const whole =  useSelector(selectWholeUser)
   const sortOption = [
     {
       value: "LastAdded",
@@ -68,14 +166,14 @@ export default function Home() {
       {
         dispatch(setProducts(products.toSorted((a,b)=>{
           
-          return Number(a.price) - Number(b.price);
+          return Number(b.price) - Number(a.price);
         })))
         break;
       }
       case "PriceHighLow":
       {
         dispatch(setProducts(products.toSorted((a,b)=>{
-          return Number(b.price) - Number(a.price);
+          return Number(a.price) - Number(b.price);
         })))
         break;
       }
@@ -125,21 +223,52 @@ export default function Home() {
     dispatch(fetchProducts());
     dispatch(fetchUser());
   }, []);
-  console.log(user)
+  console.log( whole)
   return (
      
     <div>
-       {cart ? cart.map((item, index) => (
-          <div key = {index}>{item._id}</div>
-        )):""}
+      <div
+        style={{
+          position: "absolute",
+          display: displayUser,
+          width: "100%",
+          height: "100%",
+          zIndex:100,
+          backgroundColor: "rgba(100,100,100,0.5)",
+        }}
+      >
+        <UserProfile
+          userName = {user.userName}
+          totalPrice = {user.totalPrice}
+          role = {user.role}
+          handleClick={() => {
+            dispatch(setDisplayUser("none"));
+          }}
+        />
+      </div>
+
+
+      <div
+        style={{
+          position: "absolute",
+          display: displayCart,
+          width: "100%",
+          height: "100%",
+          zIndex:100,
+          backgroundColor: "rgba(100,100,100,0.5)",
+        }}
+      >
+        <UserCart
+          cart = {cart}
+          handleClick={() => {
+            dispatch(setDisplayCart("none"));
+          }}
+        />
+      </div>
+
+     
 
       <div style={{ display: "flex" }}>
-        <p>currentUser: {user?.userName}</p>
-        <p>{"total:" + user?.totalPrice}</p>
-        <p>role: {user?.role}</p>
-       
-       
-        
         <TextField
           id="outlined-select-currency"
           select
@@ -170,6 +299,7 @@ export default function Home() {
             productId = {product._id}
             productName={product.productName}
             price={product.price}
+            category = {product.category}
             onCart={(user.shoppingCart.filter(item => {
             return  item._id === product._id
             })).length}

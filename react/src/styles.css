@@ -11,3 +11,19 @@ footer div a {
   top: 4px;
   left: 5px;
 }
+.notification {
+  text-decoration: none;
+  position: relative;
+  display: inline;
+}
+
+.notification .badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  width: 12px ;
+  padding: 2px 5px;
+  border-radius: 50%;
+  background: red;
+  color: white;
+}

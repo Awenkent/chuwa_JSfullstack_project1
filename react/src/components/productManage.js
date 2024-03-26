@@ -16,8 +16,10 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { TextareaAutosize as BaseTextareaAutosize } from "@mui/base/TextareaAutosize";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useNavigate,useLocation } from "react-router-dom";
 import {
   setProducts,
+  updateProduct,
   createProduct,
   fetchProducts,
   selectProducts,
@@ -97,15 +99,17 @@ const TextareaAutosize = styled(BaseTextareaAutosize)(({ theme }) => ({
   },
 }));
 export default function productManage(props) {
+
   const dispatch = useDispatch();
-  const [productName, setProductName] = useState(props.product?props.product._id:"")
-  const [productDescription, setProductDescription]= useState(props.product?props.product.description:"")
-  const [productCategory, setProductCategory]= useState(props.product?props.product.category:"")
-  const [productPrice, setProductPrice]= useState(props.product?props.product.price:"")
-  const [productQuantity, setProductQuantity]= useState(props.product?props.product.quantity:"")
-  const [productImageLink, setProductImageLink]= useState(props.product?props.product.imageLink:"")
-  const [imagePreview,setImagePreview] = useState("https://preyash2047.github.io/assets/img/no-preview-available.png?h=824917b166935ea4772542bec6e8f636")
-  
+  const location = useLocation();
+  const [productName, setProductName] = useState(location.state?location.state.product.productName:"")
+  const [productDescription, setProductDescription]= useState(location.state?location.state.product.description:"")
+  const [productCategory, setProductCategory]= useState(location.state?location.state.product.category:"")
+  const [productPrice, setProductPrice]= useState(location.state?location.state.product.price:"")
+  const [productQuantity, setProductQuantity]= useState(location.state?location.state.product.quantity:"")
+  const [productImageLink, setProductImageLink]= useState(location.state?location.state.product.imageLink:"")
+  const [imagePreview,setImagePreview] = useState(location.state?location.state.product.imageLink:"https://preyash2047.github.io/assets/img/no-preview-available.png?h=824917b166935ea4772542bec6e8f636")
+  console.log(location.state)
  const handleProductCreation = ()=>
  {
   let productObj = {
@@ -113,9 +117,10 @@ export default function productManage(props) {
     description:productDescription,
     category:productCategory,
     price:productPrice,
-    imageLink:productImageLink
+    imageLink:productImageLink,
+    quantity: productQuantity
   };
-  dispatch(createProduct(productObj))
+  location.state? dispatch( updateProduct({product: productObj,id : location.state.product._id})) : dispatch(createProduct(productObj))
  }
  const handleProductImageLinkUpload = ()=>
  {
@@ -164,13 +169,13 @@ export default function productManage(props) {
 
 
   const matches = useMediaQuery("(min-width:600px)");
-  
+
 
 
   if (matches) {
     return (
       <div style={{maxWidth:"800px", margin:"0 auto"}}>
-        <h2>{props.product ?"Update Product" : "Create Product"}</h2>
+        <h2>{location.state ?"Update Product" : "Create Product"}</h2>
         <div
           style={{
             padding: "20px 50px",
@@ -192,7 +197,7 @@ export default function productManage(props) {
             >
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
-                  Product Name{productName}
+                  Product Name
                 </InputLabel>
                 <BootstrapInput key={1} id="name-input" value = {productName} onChange={handleProductNameChange}/>
               </FormControl>
@@ -277,7 +282,7 @@ export default function productManage(props) {
               <img src={imagePreview}></img>
               </FormControl>
               <Button variant="contained" fullWidth onClick={handleProductCreation}>
-                Add Product
+                   {location.state ?"Update Product" : "Add Product"}
               </Button>
             </Box>
           </div>
@@ -287,7 +292,7 @@ export default function productManage(props) {
   } else {
     return (
       <div style={{maxWidth:"800px", margin:"0 auto"}}>
-        <h2>create</h2>
+            <h2>{location.state ?"Update Product" : "Create Product"}</h2>
         <div
           style={{
             padding: "20px 50px",
@@ -370,7 +375,8 @@ export default function productManage(props) {
                 <img  src={imagePreview}></img>
               </FormControl>
               <Button variant="contained" fullWidth onClick={handleProductCreation}>
-                Add Product
+              {location.state ?"Update Product" : "Add Product"}
+           
               </Button>
             </Box>
           </form>
