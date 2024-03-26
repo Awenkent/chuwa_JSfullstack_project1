@@ -64,10 +64,14 @@ export const updateUser = createAsyncThunk(
 );
 
 const defaultState = {
-  userName: null,
-  shoppingCart: [],
-  totalPrice: 0,
-  role: "Regular",
+  user: {
+    userName: null,
+    shoppingCart: [],
+    totalPrice: 0,
+    role: "Regular",
+  },
+  displayUser: "none",
+  displayCart: "none",
 };
 export const userSlice = createSlice({
   name: "user",
@@ -79,10 +83,10 @@ export const userSlice = createSlice({
       // doesn't actually mutate the state because it uses the immer library,
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
-      state.userName = action.payload.userName;
-      state.shoppingCart = action.payload.shoppingCart;
-      state.role = action.payload.role;
-      state.totalPrice = action.payload.shoppingCart.reduce(
+      state.user.userName = action.payload.userName;
+      state.user.shoppingCart = action.payload.shoppingCart;
+      state.user.role = action.payload.role;
+      state.user.totalPrice = action.payload.shoppingCart.reduce(
         (currentPrice, product) => {
           return currentPrice + Number(product.price);
         },
@@ -90,11 +94,18 @@ export const userSlice = createSlice({
       );
     },
     setCart: (state, action) => {
-      state.shoppingCart = action.payload;
-
-      state.totalPrice = action.payload.reduce((currentPrice, product) => {
+      state.user.shoppingCart = action.payload;
+      state.user.totalPrice = action.payload.reduce((currentPrice, product) => {
         return currentPrice + Number(product.price);
       }, 0);
+    },
+    setDisplayUser: (state, action) => {
+      console.log(action);
+      state.displayUser = action.payload;
+    },
+    setDisplayCart: (state, action) => {
+      console.log(action);
+      state.displayCart = action.payload;
     },
   },
   extraReducers(builder) {
@@ -105,10 +116,10 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.userName = action.payload.userName;
-        state.shoppingCart = action.payload.shoppingCart;
-        state.role = action.payload.role;
-        state.totalPrice = action.payload.shoppingCart.reduce(
+        state.user.userName = action.payload.userName;
+        state.user.shoppingCart = action.payload.shoppingCart;
+        state.user.role = action.payload.role;
+        state.user.totalPrice = action.payload.shoppingCart.reduce(
           (currentPrice, product) => {
             return currentPrice + Number(product.price);
           },
@@ -127,8 +138,8 @@ export const userSlice = createSlice({
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         console.log(action);
-        state.shoppingCart = action.payload.shoppingCart;
-        state.totalPrice = action.payload.shoppingCart.reduce(
+        state.user.shoppingCart = action.payload.shoppingCart;
+        state.user.totalPrice = action.payload.shoppingCart.reduce(
           (currentPrice, product) => {
             return currentPrice + Number(product.price);
           },
@@ -143,24 +154,18 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUser, setCart } = userSlice.actions;
-
-// The function below is called a thunk and allows us to perform async logic. It
-// can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
-// will call the thunk with the `dispatch` function as the first argument. Async
-// code can then be executed and other actions can be dispatched
-const incrementAsync = (amount) => (dispatch) => {
-  setTimeout(() => {
-    dispatch(incrementByAmount(amount));
-  }, 1000);
-};
+export const { setUser, setCart, setDisplayUser, setDisplayCart } =
+  userSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state) => state.counter.value)`
-export const selectUsername = (state) => state.user.name;
-export const selectCart = (state) => state.user.shoppingCart;
-export const selectTotalPrice = (state) => state.user.totalPrice;
-export const selectRole = (state) => state.user.role;
-export const selectUser = (state) => state.user;
+export const selectUsername = (state) => state.user.user.name;
+export const selectCart = (state) => state.user.user.shoppingCart;
+export const selectTotalPrice = (state) => state.user.user.totalPrice;
+export const selectRole = (state) => state.user.user.role;
+export const selectUser = (state) => state.user.user;
+export const selectDisplayUser = (state) => state.user.displayUser;
+export const selectDisplayCart = (state) => state.user.displayCart;
+export const selectWholeUser = (state) => state;
 export default userSlice.reducer;

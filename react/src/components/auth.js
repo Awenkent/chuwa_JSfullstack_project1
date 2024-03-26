@@ -13,6 +13,7 @@ import TextField, { TextFieldProps } from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { useNavigate } from "react-router-dom";
 export default function auth(props) {
   const usernameRef = useRef(null);
   const passwordRef = useRef(null);
@@ -21,6 +22,7 @@ export default function auth(props) {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+  const navigate = useNavigate();
   const BootstrapInput = styled(InputBase)(({ theme }) => ({
     "label + &": {
       marginTop: theme.spacing(3),
@@ -114,7 +116,7 @@ export default function auth(props) {
             localStorage.setItem("token", json.token);
             localStorage.setItem("email", json.email);
             alert("Login successful!");
-            window.location.replace("/");
+            navigate("/");
           });
         } else {
           return res.text().then((text) => {
@@ -186,7 +188,13 @@ export default function auth(props) {
                 </Button>
                 <h5 style={{ width: "100%", textAlign: "left" }}>
                   Don't have an account?
-                  <a href="/signup">signup</a>
+                  <a
+                    onClick={() => {
+                      navigate("/signup");
+                    }}
+                  >
+                    signup
+                  </a>
                 </h5>
               </Box>
             </form>
@@ -260,7 +268,13 @@ export default function auth(props) {
                 </Button>
                 <h5 style={{ width: "100%", textAlign: "left" }}>
                   Already have an account?
-                  <a href="/signin">signin</a>
+                  <a
+                    onClick={() => {
+                      navigate("/signin");
+                    }}
+                  >
+                    signin
+                  </a>
                 </h5>
               </Box>
             </form>

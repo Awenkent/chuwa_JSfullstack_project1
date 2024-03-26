@@ -6,7 +6,8 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import {
   setUser,
   setCart,
@@ -18,16 +19,18 @@ import {
 export default function Product(props) {
   const cart = useSelector(selectCart);
   const user = useSelector(selectUser);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const handleAddToCart = (e) => {
+    if (Number(props.productObject.quantity) === Number(props.onCart)) {
+      alert(props.productObject.productName + "out of stock!");
+      return;
+    }
     let userObj = {
       ...user,
       shoppingCart: [...cart, props.productObject],
     };
     dispatch(updateUser(userObj));
-
     console.log("handleAddToCart()");
   };
   const handleRemoveFromCart = (e) => {
@@ -40,14 +43,19 @@ export default function Product(props) {
       }
     }
 
+    let userObj = {
+      ...user,
+      shoppingCart: [...array],
+    };
+
+    dispatch(updateUser(userObj));
     console.log("handleRemoveFromCart()");
   };
-
   const handleEditProduct = (e) => {
     console.log("handleEditProduct() at");
-    console.log(e.target.dataset.productId);
+    navigate("/productManage", { state: { product: props.productObject } });
+    console.log(e.target.dataset.productid);
   };
-
   const propsToPass = {
     productObject: props.productObject,
     productId: props.productId,
@@ -66,7 +74,6 @@ export default function Product(props) {
     console.log("handleProductDetail()");
     console.log(props.productId);
   };
-
   return (
     <Card sx={{ padding: "15px", border: "1px solid rgb(200,200,200)" }}>
       <CardMedia

@@ -7,6 +7,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Pagination from "@mui/material/Pagination";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   setUser,
@@ -16,6 +17,11 @@ import {
   selectRole,
   selectTotalPrice,
   selectUser,
+  selectDisplayUser,
+  selectDisplayCart,
+  setDisplayUser,
+  setDisplayCart,
+  selectWholeUser,
 } from "../redux/userSlice";
 import {
   setProducts,
@@ -30,12 +36,14 @@ export default function Home() {
   const cart = useSelector(selectCart);
   const products = useSelector(selectProducts);
   const user = useSelector(selectUser);
-
+  const navigate = useNavigate();
   const minMatches = useMediaQuery("(min-width:800px)");
   const middleMatches = useMediaQuery("(min-width:600px)");
   const maxMatches = useMediaQuery("(min-width:400px)");
-  const [status, setstatus] = useState(false);
+  const displayUser = useSelector(selectDisplayUser);
+  const displayCart = useSelector(selectDisplayCart);
   const sortOptionRef = useRef();
+  const whole = useSelector(selectWholeUser);
   const sortOption = [
     {
       value: "LastAdded",
