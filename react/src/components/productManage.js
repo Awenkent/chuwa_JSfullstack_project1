@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState,useRef } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
@@ -10,105 +10,172 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
-
+import {useDispatch } from "react-redux";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { TextareaAutosize as BaseTextareaAutosize } from "@mui/base/TextareaAutosize";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useMediaQuery from "@mui/material/useMediaQuery";
-export default function productManage() {
-  const matches = useMediaQuery("(min-width:600px)");
-  const BootstrapInput = styled(InputBase)(({ theme }) => ({
-    "label + &": {
-      marginTop: theme.spacing(3),
+import { useNavigate,useLocation } from "react-router-dom";
+import {
+  setProducts,
+  updateProduct,
+  createProduct,
+  fetchProducts,
+  selectProducts,
+} from "../redux/productSlice";
+const BootstrapInput = styled(InputBase)(({ theme }) => ({
+  "label + &": {
+    marginTop: theme.spacing(3),
+  },
+  "& .MuiInputBase-input": {
+    borderRadius: 4,
+    position: "relative",
+    backgroundColor: theme.palette.mode === "light" ? "white" : "white",
+    border: "1px solid",
+    borderColor: theme.palette.mode === "light" ? "#E0E3E7" : "#2D3843",
+    fontSize: 16,
+    width: "100%",
+    padding: "10px 12px",
+    transition: theme.transitions.create([
+      "border-color",
+      "background-color",
+      "box-shadow",
+    ]),
+    // Use the system font instead of the default Roboto font.
+    fontFamily: [
+      "-apple-system",
+      "BlinkMacSystemFont",
+      '"Segoe UI"',
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif",
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(","),
+    "&:focus": {
+      boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.2rem`,
+      borderColor: theme.palette.primary.main,
     },
-    "& .MuiInputBase-input": {
-      borderRadius: 4,
-      position: "relative",
-      backgroundColor: theme.palette.mode === "light" ? "white" : "white",
-      border: "1px solid",
-      borderColor: theme.palette.mode === "light" ? "#E0E3E7" : "#2D3843",
-      fontSize: 16,
-      width: "100%",
-      padding: "10px 12px",
-      transition: theme.transitions.create([
-        "border-color",
-        "background-color",
-        "box-shadow",
-      ]),
-      // Use the system font instead of the default Roboto font.
-      fontFamily: [
-        "-apple-system",
-        "BlinkMacSystemFont",
-        '"Segoe UI"',
-        "Roboto",
-        '"Helvetica Neue"',
-        "Arial",
-        "sans-serif",
-        '"Apple Color Emoji"',
-        '"Segoe UI Emoji"',
-        '"Segoe UI Symbol"',
-      ].join(","),
-      "&:focus": {
-        boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.2rem`,
-        borderColor: theme.palette.primary.main,
-      },
+  },
+}));
+const TextareaAutosize = styled(BaseTextareaAutosize)(({ theme }) => ({
+  "label + &": {
+    marginTop: theme.spacing(3),
+  },
+  "& .MuiInputBase-input": {
+    borderRadius: 4,
+    position: "relative",
+    backgroundColor: theme.palette.mode === "light" ? "#F3F6F9" : "#1A2027",
+    border: "1px solid",
+    borderColor: theme.palette.mode === "light" ? "#E0E3E7" : "#2D3843",
+    fontSize: 16,
+    width: "100%",
+    padding: "10px 12px",
+    transition: theme.transitions.create([
+      "border-color",
+      "background-color",
+      "box-shadow",
+    ]),
+    // Use the system font instead of the default Roboto font.
+    fontFamily: [
+      "-apple-system",
+      "BlinkMacSystemFont",
+      '"Segoe UI"',
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif",
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(","),
+    "&:focus": {
+      boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.2rem`,
+      borderColor: theme.palette.primary.main,
     },
-  }));
-  const TextareaAutosize = styled(BaseTextareaAutosize)(({ theme }) => ({
-    "label + &": {
-      marginTop: theme.spacing(3),
-    },
-    "& .MuiInputBase-input": {
-      borderRadius: 4,
-      position: "relative",
-      backgroundColor: theme.palette.mode === "light" ? "#F3F6F9" : "#1A2027",
-      border: "1px solid",
-      borderColor: theme.palette.mode === "light" ? "#E0E3E7" : "#2D3843",
-      fontSize: 16,
-      width: "100%",
-      padding: "10px 12px",
-      transition: theme.transitions.create([
-        "border-color",
-        "background-color",
-        "box-shadow",
-      ]),
-      // Use the system font instead of the default Roboto font.
-      fontFamily: [
-        "-apple-system",
-        "BlinkMacSystemFont",
-        '"Segoe UI"',
-        "Roboto",
-        '"Helvetica Neue"',
-        "Arial",
-        "sans-serif",
-        '"Apple Color Emoji"',
-        '"Segoe UI Emoji"',
-        '"Segoe UI Symbol"',
-      ].join(","),
-      "&:focus": {
-        boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.2rem`,
-        borderColor: theme.palette.primary.main,
-      },
-    },
-  }));
+  },
+}));
+export default function productManage(props) {
 
-  const VisuallyHiddenInput = styled("input")({
-    clip: "rect(0 0 0 0)",
-    clipPath: "inset(50%)",
-    height: 1,
-    overflow: "hidden",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    whiteSpace: "nowrap",
-    width: 1,
-  });
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const [productName, setProductName] = useState(location.state?location.state.product.productName:"")
+  const [productDescription, setProductDescription]= useState(location.state?location.state.product.description:"")
+  const [productCategory, setProductCategory]= useState(location.state?location.state.product.category:"")
+  const [productPrice, setProductPrice]= useState(location.state?location.state.product.price:"")
+  const [productQuantity, setProductQuantity]= useState(location.state?location.state.product.quantity:"")
+  const [productImageLink, setProductImageLink]= useState(location.state?location.state.product.imageLink:"")
+  const [imagePreview,setImagePreview] = useState(location.state?location.state.product.imageLink:"https://preyash2047.github.io/assets/img/no-preview-available.png?h=824917b166935ea4772542bec6e8f636")
+  console.log(location.state)
+ const handleProductCreation = ()=>
+ {
+  let productObj = {
+    productName: productName,
+    description:productDescription,
+    category:productCategory,
+    price:productPrice,
+    imageLink:productImageLink,
+    quantity: productQuantity
+  };
+  location.state? dispatch( updateProduct({product: productObj,id : location.state.product._id})) : dispatch(createProduct(productObj))
+ }
+ const handleProductImageLinkUpload = ()=>
+ {
+    setImagePreview(productImageLink)
+ }
+  const handleProductNameChange = (e) =>
+  {
+    console.log("handleProductNameChange")
+    setProductName(e.target.value)
+    
+  }
+  
+  const handleProductDescriptionChange = (e) =>
+  {
+    console.log("handleProductDescriptionChange")
+    setProductDescription(e.target.value)
+  }
+  
+  const handleProductCategoryChange = (e) =>
+  {
+    console.log("handleProductCategoryChange")
+    setProductCategory(e.target.value)
+    
+  }
+
+  const handleProductPriceChange = (e) =>
+  {
+    console.log("handleProductPriceChange")
+    setProductPrice(e.target.value)
+  }
+  
+  const handleProductQuantityChange = (e) =>
+  {
+    console.log("handleProductQuantityChange")
+    setProductQuantity(e.target.value)
+    
+  }
+  const handleProductImageLinkChange = (e) =>
+  {
+  
+    console.log("handleProductImageLinkChange")
+    setProductImageLink(e.target.value)
+    
+
+  }
+
+
+  const matches = useMediaQuery("(min-width:600px)");
+
+
 
   if (matches) {
     return (
       <div style={{maxWidth:"800px", margin:"0 auto"}}>
-        <h2>Sign up an account</h2>
+        <h2>{location.state ?"Update Product" : "Create Product"}</h2>
         <div
           style={{
             padding: "20px 50px",
@@ -116,7 +183,7 @@ export default function productManage() {
             backgroundColor: "white",
           }}
         >
-          <form action="" style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center" }}>
             <Box
               component="div"
               sx={{
@@ -132,14 +199,14 @@ export default function productManage() {
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Name
                 </InputLabel>
-                <BootstrapInput id="password-input" />
+                <BootstrapInput key={1} id="name-input" value = {productName} onChange={handleProductNameChange}/>
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Description
                 </InputLabel>
-                <TextareaAutosize aria-label="empty textarea" minRows={8} />
+                <TextareaAutosize aria-label="empty textarea" minRows={8} value = {productDescription} onChange={handleProductDescriptionChange}/>
               </FormControl>
               <div
                 style={{
@@ -153,13 +220,13 @@ export default function productManage() {
                   <InputLabel shrink htmlFor="bootstrap-input">
                     Category
                   </InputLabel>
-                  <BootstrapInput id="category-input" />
+                  <BootstrapInput id="category-input" value = {productCategory} onChange={handleProductCategoryChange}/>
                 </FormControl>
                 <FormControl variant="standard" fullWidth>
                   <InputLabel shrink htmlFor="bootstrap-input">
                     Price
                   </InputLabel>
-                  <BootstrapInput id="price-input" />
+                  <BootstrapInput id="price-input" value = {productPrice} onChange={handleProductPriceChange}/>
                 </FormControl>
               </div>
 
@@ -179,7 +246,7 @@ export default function productManage() {
                   <InputLabel shrink htmlFor="bootstrap-input">
                     In Stock Quantity
                   </InputLabel>
-                  <BootstrapInput id="quantity-input" />
+                  <BootstrapInput id="quantity-input" value = {productQuantity} onChange={handleProductQuantityChange}/>
                 </FormControl>
                 <FormControl
                   variant="standard"
@@ -191,6 +258,7 @@ export default function productManage() {
                   </InputLabel>
                   <BootstrapInput
                     id="outlined-adornment-password"
+                    value = {productImageLink} onChange={handleProductImageLinkChange}
                     endAdornment={
                       <InputAdornment position="end">
                         <Button
@@ -199,29 +267,32 @@ export default function productManage() {
                           role={undefined}
                           variant="contained"
                           tabIndex={-1}
+                          onClick ={handleProductImageLinkUpload} 
                           startIcon={<CloudUploadIcon />}
                         >
                           Upload
-                          <VisuallyHiddenInput type="file" />
+                         
                         </Button>
                       </InputAdornment>
                     }
                   />
                 </FormControl>
               </div>
-
-              <Button variant="contained" fullWidth>
-                Add Product
+              <FormControl variant="standard" fullWidth>
+              <img src={imagePreview}></img>
+              </FormControl>
+              <Button variant="contained" fullWidth onClick={handleProductCreation}>
+                   {location.state ?"Update Product" : "Add Product"}
               </Button>
             </Box>
-          </form>
+          </div>
         </div>
       </div>
     );
   } else {
     return (
       <div style={{maxWidth:"800px", margin:"0 auto"}}>
-        <h2>create</h2>
+            <h2>{location.state ?"Update Product" : "Create Product"}</h2>
         <div
           style={{
             padding: "20px 50px",
@@ -245,41 +316,42 @@ export default function productManage() {
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Name
                 </InputLabel>
-                <BootstrapInput id="password-input" />
+                <BootstrapInput id="name-input" value = {productName} onChange={handleProductNameChange} />
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Description
                 </InputLabel>
-                <TextareaAutosize aria-label="empty textarea" minRows={8} />
+                <TextareaAutosize aria-label="empty textarea" minRows={8} value = {productDescription} onChange={handleProductDescriptionChange}/>
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Category
                 </InputLabel>
-                <BootstrapInput id="category-input" />
+                <BootstrapInput id="category-input" value = {productCategory} onChange={handleProductCategoryChange}/>
               </FormControl>
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Price
                 </InputLabel>
-                <BootstrapInput id="price-input" />
+                <BootstrapInput id="price-input" value = {productPrice} onChange={handleProductPriceChange}/>
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   In Stock Quantity
                 </InputLabel>
-                <BootstrapInput id="quantity-input" />
+                <BootstrapInput id="quantity-input" value = {productQuantity} onChange={handleProductQuantityChange}/>
               </FormControl>
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="imageLink-input">
                   Add Image Link
                 </InputLabel>
                 <BootstrapInput
-                  id="outlined-adornment-password"
+                  id="imageLink_input"
+                  value = {productImageLink} onChange={handleProductImageLinkChange}
                   endAdornment={
                     <InputAdornment position="end">
                       <Button
@@ -288,18 +360,23 @@ export default function productManage() {
                         role={undefined}
                         variant="contained"
                         tabIndex={-1}
+                        onClick ={handleProductImageLinkUpload} 
                         startIcon={<CloudUploadIcon />}
                       >
                         Upload
-                        <VisuallyHiddenInput type="file" />
+                       
                       </Button>
                     </InputAdornment>
                   }
                 />
-              </FormControl>
 
-              <Button variant="contained" fullWidth>
-                Add Product
+              </FormControl>
+ <FormControl variant="standard" fullWidth>
+                <img  src={imagePreview}></img>
+              </FormControl>
+              <Button variant="contained" fullWidth onClick={handleProductCreation}>
+              {location.state ?"Update Product" : "Add Product"}
+           
               </Button>
             </Box>
           </form>
