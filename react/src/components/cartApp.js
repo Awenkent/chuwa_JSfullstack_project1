@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Badge, Drawer, Grid, LinearProgress } from "@material-ui/core";
 import { AddShoppingCart } from "@material-ui/icons";
-import selectCart from "../redux/userSlice";
-import axios from "axios";
+import {selectCart} from "../redux/userSlice";
+import selectProducts from "../redux/productSlice";
 const { useSelector } = require("react-redux");
 import { Wrapper, StyledButton } from "./cartApp.styles";
 import Cart from "./cart";
@@ -15,60 +15,51 @@ const CartApp = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const cart = useSelector(selectCart);
-        const response = [];
+    const fetchProducts = async() => {
+      const cart = useSelector(selectCart);
+      //console.log(cart);
+      const products = useSelector(selectProducts);
+      //console.log(products);
+      const response = [];
 
-        // Create an object to keep track of the frequency of each product ID
-        const frequencyMap = {};
+      // Create an object to keep track of the frequency of each product ID
+      const frequencyMap = {};
 
-        // Count the frequency of each product ID
-        cart.forEach((productId) => {
-          if (frequencyMap[productId]) {
-            frequencyMap[productId]++;
-          } else {
-            frequencyMap[productId] = 1;
-          }
-        });
-
-        // Iterate through each unique product ID
-        for (const productId of Object.keys(frequencyMap)) {
-          try {
-            const { data: product } = await axios.get(
-              `http://localhost:4000/product/${productId}`
-            );
-
-            // Modify the product object before adding it to the response array
-            const modifiedProduct = {
-              id: product._id, // Change _id to id
-              productName: product.productName,
-              price: product.price,
-              amount: frequencyMap[productId], // Set amount to the frequency
-              imageLink: product.imageLink,
-              description: product.description,
-              __v: product.__v,
-            };
-
-            delete modifiedProduct.quantity; // Remove the quantity attribute
-
-            response.push(modifiedProduct);
-          } catch (error) {
-            console.log("Error at get product from backend:"+error);
-            console.error(`Error fetching product ${productId}:`, error);
-          }
+      // Count the frequency of each product ID
+      cart.forEach((productId) => {
+        if (frequencyMap[productId]) {
+          frequencyMap[productId]++;
+        } else {
+          frequencyMap[productId] = 1;
         }
+      });
 
-        setCartItems(response);
-        setIsLoading(false);
-      } catch (error) {
-        setError("Error fetching data");
-        setIsLoading(false);
+      // Iterate through each unique product ID
+      for (const productId of Object.keys(frequencyMap)) {
+        const product = products.find((p) => p.id === productId);
+
+        // Modify the product object before adding it to the response array
+        const modifiedProduct = {
+          id: product._id, // Change _id to id
+          productName: product.productName,
+          price: product.price,
+          amount: frequencyMap[productId], // Set amount to the frequency
+          imageLink: product.imageLink,
+          description: product.description,
+          __v: product.__v,
+        };
+
+        delete modifiedProduct.quantity; // Remove the quantity attribute
+
+        response.push(modifiedProduct);
       }
+
+      setCartItems(response);
+      setIsLoading(false);
     };
 
     fetchProducts();
-  },[]);
+  }, []);
 
   const getTotalItems = (items) =>
     items.reduce((acc, item) => acc + item.amount, 0);
