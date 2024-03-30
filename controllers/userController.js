@@ -7,7 +7,7 @@ const getAllUsers = async (req, res) => {
     res.status(200).json(users);
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Server Error:"+ err.message });
   }
 };
 
@@ -25,7 +25,7 @@ const getCartFromUser = async (req, res, next) => {
    
   } catch (err) {
     console.log(err.message);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Server Error:" + err.message });
   }
 };
 
@@ -46,7 +46,7 @@ const getOneUser = async (req, res) => {
    
   } catch (err) {
     console.log(err)
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Error on getting User:" + err.message });
   }
 };
 
@@ -55,13 +55,13 @@ const createUser = async (req, res) => {
     const user = new User(req.body);
 
     if (!user.userName || !user.password || !user.role) {
-      return res.status(400).json({ message: "Bad Request" });
+      return res.status(400).json({ message: "Bad Request: missing parameters" });
     }
     await user.save();
     res.status(201).json(user);
   } catch (err) {
     console.log(err.message);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Error on creating User:" + err.message });
   }
 };
 
@@ -82,7 +82,7 @@ const updateUser = async (req, res) => {
     })
   
   } catch (err) {
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Error on updating User:"+err.message });
   }
 };
 
@@ -91,7 +91,7 @@ const deleteUser = async (req, res) => {
     await User.findByIdAndDelete(req.id);
     res.status(200).json({ message: "User deleted" });
   } catch (err) {
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Error on deleting User:"+err.message });
   }
 };
 
