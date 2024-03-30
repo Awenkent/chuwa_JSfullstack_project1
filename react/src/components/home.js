@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import Pagination from "@mui/material/Pagination";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import Select from "@mui/material/Select";
 import {
   setUser,
   fetchUser,
@@ -47,11 +48,7 @@ function UserCart(props)
   }):""
   }
  
-  console.log(props.cart)
-  map.forEach((key,value,map)=>
-  {
-    console.log(key + " and " + value)
-  })
+
 
 
   return (
@@ -111,20 +108,22 @@ function UserProfile(props)
         <p>currentUser: {props?.userName}</p>
         <p>{"total:" + props?.totalPrice}</p>
         <p>role: {props?.role}</p>
-      <button
+      <Button
         onClick={() => {
           props.handleClick();
         }}
       >
         X
-      </button>
+      </Button>
+      <Button onClick={props.handleChangePssword}>Change Password</Button>
     </div>
   );
 }
+
+
 export default function Home() {
-  const userName = useSelector(selectUsername);
-  const totalPrice = useSelector(selectTotalPrice);
-  const role= useSelector(selectRole);
+  
+
  
   const cart = useSelector(selectCart);
   const products = useSelector(selectProducts);
@@ -135,7 +134,7 @@ export default function Home() {
   const maxMatches = useMediaQuery("(min-width:400px)");
   const displayUser =  useSelector(selectDisplayUser)
   const displayCart =  useSelector(selectDisplayCart)
-  const sortOptionRef = useRef();
+
   const whole =  useSelector(selectWholeUser)
   const sortOption = [
     {
@@ -153,28 +152,43 @@ export default function Home() {
   ];
 
   const dispatch = useDispatch();
-  const handleSort = () =>{
-    let sort = sortOptionRef.current.value;
+  const handlePageChange = (e,v)=>
+  {
+    dispatch(fetchProducts({limit:10,page:v}))
+  }
+  const handleSort = (e) =>{
+    let sort = e.target.value;
     switch (sort)
     {
       case "LastAdded":
       {
-        dispatch(setProducts(products.toReversed()))
+        console.log("la")
+        let array = products.toSorted((a,b)=>{    
+          return Number(a.creationDate) - Number(b.creationDate);
+        })
+
+        dispatch(setProducts(array))
         break;
       }
       case "PriceLowHigh":
       {
-        dispatch(setProducts(products.toSorted((a,b)=>{
-          
-          return Number(b.price) - Number(a.price);
-        })))
+        console.log("plh")
+        let array = products.toSorted((a,b)=>{    
+          return Number(a.price) - Number(b.price);
+        })
+
+      
+        dispatch(setProducts(array))
         break;
       }
       case "PriceHighLow":
       {
-        dispatch(setProducts(products.toSorted((a,b)=>{
-          return Number(a.price) - Number(b.price);
-        })))
+        console.log("phl")
+        let array = products.toSorted((a,b)=>{
+          
+          return Number(b.price) - Number(a.price);
+        }) 
+        dispatch(setProducts(array))
         break;
       }
     }
@@ -244,6 +258,7 @@ export default function Home() {
           handleClick={() => {
             dispatch(setDisplayUser("none"));
           }}
+          handleChangePssword = {()=>{navigate("/changepassword")}}
         />
       </div>
 
@@ -265,35 +280,60 @@ export default function Home() {
           }}
         />
       </div>
-
-     
-
-      <div style={{ display: "flex" }}>
-        <TextField
-          id="outlined-select-currency"
-          select
-          variant="filled"
-          defaultValue="LastAdded"
-          inputRef={sortOptionRef}
-          onChange={handleSort}
-        >
+      <div style={{ display: "flex",
+      alignItems:"center",
+      justifyContent:"flex-end",
+      margin: "15px 20px",
+      gap: "5px",
+      
+    }}>
+      
+      <Select
+        labelId="demo-select-small-label"
+        id="demo-select-small"
+  
+        size="small"
+      
+        defaultValue="LastAdded"
+        onChange={handleSort}  
+      >
+       
           {sortOption.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
           ))}
-        </TextField>
+       </Select>
+     
+        <div
+            style={user.role === "Regular"?{}: {
+              height:"35px",
+              backgroundColor: "rgb(80,72,229)",
+              display: "inline-flex",
+              justifyContent: "space-around",
+              alignItems: "center",
+              borderRadius: "5px",
+            }}
+          >
         <Button
+         disabled={user.role === "Regular" ? true : false}
+          variant="outlined"
+          style={user.role === "Regular" ?{     
+            width: "100%",
+          }:{width: "100%",
+          color: "white"}}
           onClick={()=>{navigate("/productManage")}
           }
         >
           Add Product
         </Button>
+        </div>
       </div>
          
       <div style={gridStyle}>
         {products ? products.map((product, index) => (
           <Product
+          
             key={index}
             productObject = {product}
             productId = {product._id}
@@ -311,6 +351,7 @@ export default function Home() {
       </div>
 
       <Pagination
+        onChange = {handlePageChange}
         count={10}
         variant="outlined"
         shape="rounded"

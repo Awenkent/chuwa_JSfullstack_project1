@@ -82,7 +82,7 @@ export default function Product(props) {
         onClick={handleProductDetail}
         sx={{ height: 180, borderRadius: "5px" }}
         image={props.productObject.imageLink}
-        title="green iguana"
+        title={props.productName}
       />
 
       <div style={{ textAlign: "left" }}>
@@ -146,6 +146,7 @@ export default function Product(props) {
                       height: "30px",
                       minWidth: "40px",
                       width: "100%",
+                      color: "white"
                     }}
                     data-productobject={props.productObject}
                     onClick={handleAddToCart}

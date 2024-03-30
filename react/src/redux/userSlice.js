@@ -17,7 +17,6 @@ export const fetchUser = createAsyncThunk('user/fetchUsers', async () => {
           }).then(res => {
           if(res.ok) {  
             return res.json()
-          // handle the response
           }
           else if(res.status === 401)
           {
@@ -27,11 +26,11 @@ export const fetchUser = createAsyncThunk('user/fetchUsers', async () => {
           }
           else
           {
-              console.log(res.status);
               return res.text().then(text => { throw new Error(text) });
           }
         }) .catch(error => {
               console.log("The error is: " + error);
+              throw new Error("Connection failed")
              // alert("Your session is ended, please login again.");
          });
          console.log(response)
@@ -40,12 +39,7 @@ export const fetchUser = createAsyncThunk('user/fetchUsers', async () => {
     }
     else
     {
-      return {
-        userName: null,
-        shoppingCart: [],
-        totalPrice: 0,
-        role: "Regular",
-      };
+      throw new Error("No token founded")
     }
 })
 

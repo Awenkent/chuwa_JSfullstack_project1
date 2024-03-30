@@ -1,6 +1,7 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import {useRef} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import SearchIcon from "@mui/icons-material/Search";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
@@ -22,13 +23,38 @@ import {
   selectTotalPrice,
   selectUser,
 } from "../redux/userSlice";
+import {
+  setProducts,
+  createProduct,
+  fetchProducts,
+  selectProducts,
+} from "../redux/productSlice";
 
 export default function Header(props) {
+  const searchRef = useRef();
+  const products = useSelector(selectProducts)
   const totalPrice = useSelector(selectTotalPrice);
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const matches = useMediaQuery("(min-width:600px)");
   const navigate = useNavigate();
+  const handleSearch = ()=>{
+    
+    if(searchRef.current.value)
+    {
+     dispatch(setProducts( products.filter((product)=>{
+        return product.productName.indexOf(searchRef.current.value) !== -1
+      })
+      ))
+    } 
+    else
+    {
+      dispatch(fetchProducts());
+    }
+    
+  
+   
+  }
   const handleDisplayUser = ()=>{
     console.log("handleDisplayUser")
     dispatch(setDisplayUser("block"))
@@ -74,8 +100,9 @@ export default function Header(props) {
             sx={{ ml: 1, flex: 1 }}
             placeholder="Search Products"
             inputProps={{ "aria-label": "search google maps" }}
+            inputRef={searchRef}
           />
-          <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
+          <IconButton type="button" sx={{ p: "10px" }} aria-label="search" onClick={handleSearch}>
             <SearchIcon />
           </IconButton>
         </Paper>
@@ -89,25 +116,25 @@ export default function Header(props) {
           }}
         >
             <span class="notification">
-          <ManageAccountsOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayUser}/>
+          <ManageAccountsOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayUser}/>
           </span>
           {user.userName !== null?
-          (<span style={{ margin: "0 10px" }} onClick={handleSignOut}>
+          (<span class ="clickable" style={{ margin: "0 10px" }} onClick={handleSignOut}>
              Sign Out
           </span>) :
             (
-            <span style={{ margin: "0 10px" }} onClick={()=>{navigate("/signin")}}>
+            <span class ="clickable" style={{ margin: "0 10px" }} onClick={()=>{navigate("/signin")}}>
               Sign in
             </span>
             )
           }
            {user.shoppingCart.length !== 0 ?
            (  <span class="notification">
-           <ShoppingCartOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayCart}/>
+           <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
            <span class="badge">{user.shoppingCart.length}</span>
          </span>)
            :
-           (  <ShoppingCartOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayCart}/>)
+           (  <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
           }
         
           <a style={{ margin: "0 10px" }}> {"$" + totalPrice}</a>
@@ -135,21 +162,38 @@ export default function Header(props) {
           </div>
 
           <div
-            style={{
-              flex: 1,
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
-              flexWrap: "nowrap",
-            }}
-          >
-            <ManageAccountsOutlinedIcon className="icon" fontSize="medium" />
-            <a style={{ margin: "0 10px" }}>
-              {props.userName ? "Logout" : "Login"}
-            </a>
-            <ShoppingCartOutlinedIcon className="icon" fontSize="medium" />
-            <a style={{ margin: "0 10px" }}>{"$" + totalPrice}</a>
-          </div>
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-end",
+            flexWrap: "nowrap",
+          }}
+        >
+            <span class="notification">
+          <ManageAccountsOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayUser}/>
+          </span>
+          {user.userName !== null?
+          (<span class ="clickable" style={{ margin: "0 10px" }} onClick={handleSignOut}>
+             Sign Out
+          </span>) :
+            (
+            <span class ="clickable" style={{ margin: "0 10px" }} onClick={()=>{navigate("/signin")}}>
+              Sign in
+            </span>
+            )
+          }
+           {user.shoppingCart.length !== 0 ?
+           (  <span class="notification">
+           <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
+           <span class="badge">{user.shoppingCart.length}</span>
+         </span>)
+           :
+           (  <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
+          }
+        
+          <a style={{ margin: "0 10px" }}> {"$" + totalPrice}</a>
+        </div>
         </div>
         <Paper
           component="form"

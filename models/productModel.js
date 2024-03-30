@@ -15,6 +15,7 @@ const productSchema = new mongoose.Schema(
     },
     quantity: {
       type: Number,
+      min: [0, 'Item out of Stock'],
       required: true,
     },
     imageLink: {
