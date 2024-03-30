@@ -223,7 +223,6 @@ export default function Home() {
   console.log(whole);
   return (
     <div>
-      <CartApp/>
       <div
         style={{
           position: "absolute",
@@ -261,7 +260,6 @@ export default function Home() {
           }}
         />
       </div>
-      
 
       <div style={{ display: "flex" }}>
         <TextField
