@@ -171,7 +171,7 @@ export default function Product(props) {
                       height: "30px",
                       minWidth: "40px",
                       width: "100%",
-                      color: "white"
+                      color: "white",
                     }}
                     data-productobject={props.productObject}
                     onClick={handleAddToCart}

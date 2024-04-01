@@ -31,7 +31,7 @@ import {
 } from "../redux/productSlice";
 
 export default function ProductDetailsPage() {
-  const matches = useMediaQuery("(min-width:600px)");
+  const matches = useMediaQuery("(min-width:700px)");
   const cart = useSelector(selectCart);
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -91,6 +91,7 @@ export default function ProductDetailsPage() {
   
     console.log("handleRemoveFromCart()");
   };
+
   const handleEditProduct = (e) => {
     console.log("handleEditProduct() at");
     navigate("/productManage", {
@@ -183,37 +184,52 @@ export default function ProductDetailsPage() {
                 >
                   {onCart ? (
                     <>
-                      <Button
-                        data-productobject={location.state.productObject}
+                      <div
                         style={{
-                          height: "30px",
-                          minWidth: "0px",
-                          color: "white",
-                        }}
-                        onClick={handleAddToCart}
-                      >
-                        +
-                      </Button>
-                      <span
-                        style={{
+                          width: "100%",
                           textAlign: "center",
-                          minWidth: "0px",
-                          color: "white",
+                          textWrap: "nowrap",
+                          minWidth: "120px",
+                          minHeight: "50px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
-                        {onCart}
-                      </span>
-                      <Button
-                        data-productobject={location.state.productObject}
-                        style={{
-                          height: "30px",
-                          minWidth: "0px",
-                          color: "white",
-                        }}
-                        onClick={handleRemoveFromCart}
-                      >
-                        -
-                      </Button>
+                        <Button
+                          data-productobject={location.state.productObject}
+                          style={{
+                            height: "100%",
+                            width: "30px",
+                            color: "white",
+                            textAlign: "center",
+                          }}
+                          onClick={handleAddToCart}
+                        >
+                          +
+                        </Button>
+                        <span
+                          style={{
+                            textAlign: "center",
+                            width: "60px",
+                            color: "white",
+                          }}
+                        >
+                          {onCart}
+                        </span>
+                        <Button
+                          data-productobject={location.state.productObject}
+                          style={{
+                            height: "100%",
+                            width: "30px",
+                            color: "white",
+                            textAlign: "center",
+                          }}
+                          onClick={handleRemoveFromCart}
+                        >
+                          -
+                        </Button>
+                      </div>
                     </>
                   ) : (
                     <>
@@ -223,9 +239,9 @@ export default function ProductDetailsPage() {
                           style={{
                             backgroundColor: "rgb(80,72,229)",
                             textAlign: "center",
-                            minWidth: "80px",
+                            textWrap: "nowrap",
+                            minWidth: "120px",
                             minHeight: "50px",
-                            width: "100%",
                             borderRadius: "5px",
                             color: "white",
                           }}
@@ -244,8 +260,8 @@ export default function ProductDetailsPage() {
                     variant="outlined"
                     style={{
                       textAlign: "center",
-                      width: "100%",
-                      height: "100%",
+                      minWidth: "120px",
+                      minHeight: "50px",
                       borderRadius: "5px",
                       color: "black",
                     }}
