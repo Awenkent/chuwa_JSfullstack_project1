@@ -1,23 +1,24 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {useRef} from 'react';
+import { useEffect } from "react";
 import Button from "@mui/material/Button";
-import Product from "./product";
+import Product from "../components/product";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuItem from "@mui/material/MenuItem";
-import TextField from "@mui/material/TextField";
+import UserCart from "../components/userCart"
+import UserProfile from "../components/userProfile"
 import Pagination from "@mui/material/Pagination";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+
 import Select from "@mui/material/Select";
 import {
   setUser,
   fetchUser,
-  selectUsername,
+  selectCartMerged,
   selectCart,
-  selectRole,
-  selectTotalPrice,
+  updateUser,
   selectUser,
+  setCartMerge,
   selectDisplayUser,
   selectDisplayCart,
   setDisplayUser,
@@ -31,99 +32,11 @@ import {
   selectProducts,
 } from "../redux/productSlice";
 
-function UserCart(props)
-{
-  var map = new Map();
-  var set = new Set();
-  {props.cart?props.cart.map((product, index) => {
-
-    if(map.has(product._id))
-    {
-      map.set(product._id,map.get(product._id) + 1)
-    }
-    else
-    {
-      map.set(product._id, 1)
-    }
-  }):""
-  }
- 
 
 
-
-  return (
-    <div
-      style={{
-        backgroundColor: "white",
-        padding: "50px",
-        maxWidth: "300px",
-        maxHeight: "500px",
-        overflowY:"auto"
-      }}
-    >
-
-        {props.cart?props.cart.map((product, index) => {
-          if(!set.has(product._id))
-          {
-            set.add(product._id)
-            return(
-          <Product
-          key={index}
-          productObject = {product}
-          productId = {product._id}
-          productName={product.productName}
-          price={product.price}
-          category = {product.category}
-          onCart={map.get(product._id)}
-          quantity={product.quantity}
-          imageLink={product.imageLink}
-          description={product.description}
-        ></Product>
-        )
-          }
-        
-        
-        }
-        ):""}
-      <button
-        onClick={() => {
-          props.handleClick();
-        }}
-      >
-        X
-      </button>
-    </div>
-  );
-}
-function UserProfile(props)
-{
-  return (
-    <div
-      style={{
-        backgroundColor: "green",
-        padding: "50px",
-        maxWidth: "300px",
-      }}
-    >
-        <p>currentUser: {props?.userName}</p>
-        <p>{"total:" + props?.totalPrice}</p>
-        <p>role: {props?.role}</p>
-      <Button
-        onClick={() => {
-          props.handleClick();
-        }}
-      >
-        X
-      </Button>
-      <Button onClick={props.handleChangePssword}>Change Password</Button>
-    </div>
-  );
-}
 
 
 export default function Home() {
-  
-
  
   const cart = useSelector(selectCart);
   const products = useSelector(selectProducts);
@@ -134,6 +47,7 @@ export default function Home() {
   const maxMatches = useMediaQuery("(min-width:400px)");
   const displayUser =  useSelector(selectDisplayUser)
   const displayCart =  useSelector(selectDisplayCart)
+  const cartMerged =  useSelector(selectCartMerged)
 
   const whole =  useSelector(selectWholeUser)
   const sortOption = [
@@ -233,9 +147,25 @@ export default function Home() {
     };
   }
 
+  if(cartMerged)
+  {
+    console.log("doMerge")
+    dispatch(updateUser(user))
+    dispatch(setCartMerge())
+  }
+
   useEffect(() => {
     dispatch(fetchProducts());
-    dispatch(fetchUser());
+    if(user.userName === null && user.shoppingCart.length !== 0)
+    {
+        console.log("shopping cart need to merge")
+        dispatch(fetchUser(user))        
+    }
+    else
+    {
+      dispatch(fetchUser()); 
+    }
+   
   }, []);
   console.log( whole)
   return (
@@ -243,8 +173,9 @@ export default function Home() {
     <div>
       <div
         style={{
-          position: "absolute",
+          position: "fixed",
           display: displayUser,
+          minHeight: "1000px",
           width: "100%",
           height: "100%",
           zIndex:100,
@@ -283,7 +214,7 @@ export default function Home() {
       <div style={{ display: "flex",
       alignItems:"center",
       justifyContent:"flex-end",
-      margin: "15px 20px",
+      padding: "10px 20px",
       gap: "5px",
       
     }}>
@@ -291,9 +222,7 @@ export default function Home() {
       <Select
         labelId="demo-select-small-label"
         id="demo-select-small"
-  
         size="small"
-      
         defaultValue="LastAdded"
         onChange={handleSort}  
       >
@@ -331,7 +260,7 @@ export default function Home() {
       </div>
          
       <div style={gridStyle}>
-        {products ? products.map((product, index) => (
+        {products?.map((product, index) => (
           <Product
           
             key={index}
@@ -347,10 +276,11 @@ export default function Home() {
             imageLink={product.imageLink}
             description={product.description}
           ></Product>
-        )):""}
+        ))}
       </div>
 
       <Pagination
+    
         onChange = {handlePageChange}
         count={10}
         variant="outlined"

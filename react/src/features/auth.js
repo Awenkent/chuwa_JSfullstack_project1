@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import {useRef} from 'react';
 import { alpha, styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
@@ -14,8 +14,22 @@ import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { Input } from "@mui/material";
+import {
+  setUser,
+  fetchUser,
+  setDisplayCart,
+  setDisplayUser,
+  selectUsername,
+  selectCart,
+  selectRole,
+  selectTotalPrice,
+  selectUser,
+} from "../redux/userSlice";
 export default function auth(props) {
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
   const usernameRef = useRef(null);
   const passwordRef = useRef(null);
   const adminRef = useRef(null);
@@ -34,7 +48,15 @@ export default function auth(props) {
   const navigate = useNavigate();
   
 
+  useEffect(() => {
+   
+    if(user.userName === null && props.case === "change-password")
+    {
+      dispatch(fetchUser()); 
+    
+    }
 
+  }, []);
   const handleSignup = ()=>{
     let username = usernameRef.current.value;
     let password = passwordRef.current.value;
@@ -98,7 +120,7 @@ export default function auth(props) {
   const handleSignin = ()=>{
     var username = usernameRef.current.value;
     var password = passwordRef.current.value;
-
+    
     let errorObj = {
       errorCount:0
     }
@@ -225,7 +247,7 @@ export default function auth(props) {
       case "change-password":
         return (
           <div style={{ padding: "20px 50px" }}>
-            <h2 role = "title">Change Password</h2>
+            <h2 role = "title">Update your password ({user.userName})</h2>
             <form style={{ textAlign: "center" }}>
               <Box
                 component="div"
@@ -238,15 +260,12 @@ export default function auth(props) {
                   gap: 3,
                 }}
               >
-                <FormControl variant="standard" fullWidth>
-                  <InputLabel shrink htmlFor="bootstrap-input" >
-                    Username
-                  </InputLabel>
-                  <TextField  style={{ marginTop: "20px" }} size="small" id="password-input" inputRef={usernameRef} error = {!!errorState.usernameError} helperText={errorState.usernameError}/>
-                </FormControl>
+             
+                
+              
                 <FormControl variant="standard" fullWidth>
                   <InputLabel shrink htmlFor="bootstrap-input">
-                    password
+                    new password
                   </InputLabel>
 
                   <TextField
@@ -273,13 +292,13 @@ export default function auth(props) {
                     }}
                   />
                 </FormControl>
-                <Button variant="contained" fullWidth onClick={handleSignin}>
-                  Sign In
+                
+                <Button variant="contained" fullWidth onClick={()=>{
+                  navigate("/resetLinkSent")
+                }}>
+                  Update
                 </Button>
-                <h5 style={{ width: "100%", textAlign: "left" }}>
-                  Don't have an account?
-                  <a className ="clickable" onClick={()=>{navigate("/signup")}}>signup</a>
-                </h5>
+             
               </Box>
             </form>
           </div>

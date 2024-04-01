@@ -10,10 +10,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import {
   setUser,
-  setCart,
   selectCart,
   updateUser,
   selectUser,
+  setCart,
 } from "../redux/userSlice";
 
 export default function Product(props) {
@@ -22,15 +22,25 @@ export default function Product(props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleAddToCart = (e) => {
-    if (Number(props.productObject.quantity) === Number(props.onCart)) {
-      alert(props.productObject.productName + "out of stock!");
+  
+    if (Number(props.productObject.quantity) <= Number(props.onCart)) {
+      alert(props.productObject.productName + " out of stock!");
       return;
     }
     let userObj = {
       ...user,
       shoppingCart: [...cart, props.productObject],
     };
-    dispatch(updateUser(userObj));
+    if(user.userName === null)
+    {
+      dispatch(setUser(userObj)) 
+
+    }
+    else{
+
+      dispatch(updateUser(userObj));
+    }
+  
     console.log("handleAddToCart()");
   };
   const handleRemoveFromCart = (e) => {
@@ -38,7 +48,7 @@ export default function Product(props) {
     for (let index in array) {
       if (array[index]._id === props.productObject._id) {
         array.splice(index, 1);
-        dispatch(setCart(array));
+        
         break;
       }
     }
@@ -48,7 +58,17 @@ export default function Product(props) {
       shoppingCart: [...array],
     };
 
-    dispatch(updateUser(userObj));
+    if(user.userName === null)
+    {
+      dispatch(setUser(userObj)) 
+
+    }
+    else{
+
+      dispatch(updateUser(userObj));
+    }
+   
+  
     console.log("handleRemoveFromCart()");
   };
   const handleEditProduct = (e) => {
@@ -65,6 +85,7 @@ export default function Product(props) {
     quantity: props.quantity,
     imageLink: props.imageLink,
     description: props.description,
+    category: props.category,
     onCart: props.onCart,
   };
 
@@ -80,17 +101,17 @@ export default function Product(props) {
     <Card sx={{ padding: "15px", border: "1px solid rgb(200,200,200)" }}>
       <CardMedia
         onClick={handleProductDetail}
-        sx={{ height: 180, borderRadius: "5px" }}
+        sx={{ height: props.imageHeight ? props.imageHeight: 180, borderRadius: "5px" }}
         image={props.productObject.imageLink}
         title={props.productName}
       />
 
-      <div style={{ textAlign: "left" }}>
-        <Typography variant="body2" color="text.secondary">
-          {props.productObject.productName}
+      <div style={{ textAlign: "left",overflowY:"auto"}}>
+        <Typography variant="body2" color="text.secondary" style={{whiteSpace:"nowrap",maxWidth: props.imageHeight ? props.imageHeight: 180}}>
+          <span>{props.productObject.productName}</span> 
         </Typography>
-        <Typography variant="body2" component="p">
-          ${props.productObject.price}
+        <Typography variant="body2" component="p" style={{whiteSpace:"nowrap"}}>
+        <span> ${props.productObject.price}{Number(props.productObject.quantity) <= Number(props.onCart)? (<span style={{backgroundColor: "pink", color: "red", borderRadius:"2.5px",marginLeft:"10px"}}>Out of Stock</span>): ""} </span> 
         </Typography>
 
         <div
@@ -111,7 +132,10 @@ export default function Product(props) {
               width: "100%",
             }}
           >
-            {props.onCart ? (
+           
+            {
+       
+            props.onCart ? (
               <>
                 <Button
                   data-productobject={props.productObject}
@@ -139,6 +163,7 @@ export default function Product(props) {
               </>
             ) : (
               <>
+                
                 <div style={{ width: "100%" }}>
                   <Button
                     variant="outlined"

@@ -1,21 +1,34 @@
 import * as React from "react";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { useMediaQuery } from "@mui/material";
 
 import {
-  setUser,
   setCart,
+  setUser,
+  fetchUser,
+  selectCartMerged,
   selectCart,
   updateUser,
   selectUser,
+  setCartMerge,
+  selectDisplayUser,
+  selectDisplayCart,
+  setDisplayUser,
+  setDisplayCart,
+  selectWholeUser
 } from "../redux/userSlice";
+import {
+  setProducts,
+  createProduct,
+  fetchProducts,
+  selectProducts,
+} from "../redux/productSlice";
 
 export default function ProductDetailsPage() {
   const matches = useMediaQuery("(min-width:700px)");
@@ -31,18 +44,24 @@ export default function ProductDetailsPage() {
   }).length;
 
   const handleAddToCart = (e) => {
-    if (
-      Number(location.state.productObject.quantity) ===
-      Number(location.state.onCart)
-    ) {
-      alert(location.state.productObject.productName + "out of stock!");
+    if (Number(location.state.quantity) <= Number(onCart)) {
+      alert(location.state.productName + " out of stock!");
       return;
     }
     let userObj = {
       ...user,
       shoppingCart: [...cart, location.state.productObject],
     };
-    dispatch(updateUser(userObj));
+    if(user.userName === null)
+    {
+      dispatch(setUser(userObj)) 
+
+    }
+    else{
+
+      dispatch(updateUser(userObj));
+    }
+  
     console.log("handleAddToCart()");
   };
 
@@ -51,7 +70,6 @@ export default function ProductDetailsPage() {
     for (let index in array) {
       if (array[index]._id === location.state.productObject._id) {
         array.splice(index, 1);
-        dispatch(setCart(array));
         break;
       }
     }
@@ -61,7 +79,16 @@ export default function ProductDetailsPage() {
       shoppingCart: [...array],
     };
 
-    dispatch(updateUser(userObj));
+    if(user.userName === null)
+    {
+      dispatch(setUser(userObj)) 
+
+    }
+    else{
+
+      dispatch(updateUser(userObj));
+    }
+  
     console.log("handleRemoveFromCart()");
   };
 
@@ -72,12 +99,21 @@ export default function ProductDetailsPage() {
     });
     console.log(e.target.dataset.productid);
   };
-
+  useEffect(() => {
+   
+    if(user.userName === null)
+    {
+      dispatch(fetchUser()); 
+      dispatch(fetchProducts());
+    }
+ 
+   
+  }, []);
   if (matches) {
     return (
       <>
-        <div style={{ boxSizing: "border-box" }}>
-          <Typography variant="h3">Product Details</Typography>
+        <div style={{ boxSizing: "border-box"}}>
+        <h2> Product Details</h2>
           <Card
             sx={{
               width: "80%",
@@ -98,7 +134,6 @@ export default function ProductDetailsPage() {
               title={location.state.description}
               component="img"
             />
-
             <div
               style={{
                 textAlign: "left",
@@ -108,24 +143,30 @@ export default function ProductDetailsPage() {
                 margin: "5%",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between",
+                justifyContent: "flex-start",
                 alignItems: "start",
+                overflowY:"auto"
               }}
             >
-              <Typography variant="h3" color="text.secondary">
-                {location.state.name}
+              <Typography  color="text.secondary">
+                <h4>{location.state.category}</h4>
               </Typography>
-              <Typography variant="h4" component="p">
-                ${location.state.price}
+              <Typography color="text.secondary">
+              <h2>{location.state.name}</h2>
               </Typography>
-              <Typography variant="h5" component="p">
+              <Typography variant="h5" component="b">
+                <span>${location.state.price} {Number(location.state.quantity) <= Number(onCart)? (<span style={{backgroundColor: "pink", color: "red"}}>Out of Stock</span>): ""}</span>
+              </Typography>
+              <Typography variant="h5" color="text.secondary">
                 {location.state.description}
               </Typography>
+
 
               <div
                 style={{
                   display: "flex",
-                  width: "50%",
+                  justifyContent: "left",
+                  width: "100%",
                   gap: "5%",
                 }}
               >
