@@ -1,7 +1,6 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import {useRef} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import SearchIcon from "@mui/icons-material/Search";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
@@ -23,38 +22,13 @@ import {
   selectTotalPrice,
   selectUser,
 } from "../redux/userSlice";
-import {
-  setProducts,
-  createProduct,
-  fetchProducts,
-  selectProducts,
-} from "../redux/productSlice";
 
 export default function Header(props) {
-  const searchRef = useRef();
-  const products = useSelector(selectProducts)
   const totalPrice = useSelector(selectTotalPrice);
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const matches = useMediaQuery("(min-width:600px)");
   const navigate = useNavigate();
-  const handleSearch = ()=>{
-    
-    if(searchRef.current.value)
-    {
-     dispatch(setProducts( products.filter((product)=>{
-        return product.productName.indexOf(searchRef.current.value) !== -1
-      })
-      ))
-    } 
-    else
-    {
-      dispatch(fetchProducts());
-    }
-    
-  
-   
-  }
   const handleDisplayUser = ()=>{
     console.log("handleDisplayUser")
     dispatch(setDisplayUser("block"))
@@ -69,8 +43,6 @@ export default function Header(props) {
     localStorage.removeItem("token");
     window.location.replace("/");
 }
-
-
   if (matches) {
     return (
       <header
@@ -85,7 +57,7 @@ export default function Header(props) {
         }}
       >
         <div style={{ flex: 1 }}>
-        <h3 className ="clickable" onClick = {()=>{navigate("/")}}>
+        <h3 onClick = {()=>{navigate("/")}}>
             <b>Chuwa</b> <small>Management</small>
           </h3>
         </div>
@@ -102,9 +74,8 @@ export default function Header(props) {
             sx={{ ml: 1, flex: 1 }}
             placeholder="Search Products"
             inputProps={{ "aria-label": "search google maps" }}
-            inputRef={searchRef}
           />
-          <IconButton type="button" sx={{ p: "10px" }} aria-label="search" onClick={handleSearch}>
+          <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
             <SearchIcon />
           </IconButton>
         </Paper>
@@ -117,29 +88,29 @@ export default function Header(props) {
             flexWrap: "nowrap",
           }}
         >
-            <span className="notification">
-          <ManageAccountsOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayUser}/>
+            <span class="notification">
+          <ManageAccountsOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayUser}/>
           </span>
           {user.userName !== null?
-          (<span className ="clickable" style={{ margin: "0 10px" ,whiteSpace:"nowrap"}} onClick={handleSignOut}>
+          (<span style={{ margin: "0 10px" }} onClick={handleSignOut}>
              Sign Out
           </span>) :
             (
-            <span className ="clickable" style={{ margin: "0 10px",whiteSpace:"nowrap" }} onClick={()=>{navigate("/signin")}}>
+            <span style={{ margin: "0 10px" }} onClick={()=>{navigate("/signin")}}>
               Sign in
             </span>
             )
           }
            {user.shoppingCart.length !== 0 ?
-           (  <span className="notification">
-           <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
-           <span className="badge">{user.shoppingCart.length}</span>
+           (  <span class="notification">
+           <ShoppingCartOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayCart}/>
+           <span class="badge">{user.shoppingCart.length}</span>
          </span>)
            :
-           (  <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
+           (  <ShoppingCartOutlinedIcon className="icon" fontSize="medium" onClick={handleDisplayCart}/>)
           }
         
-          <a style={{ margin: "0 10px" }}> ${totalPrice.toFixed(2)}</a>
+          <a style={{ margin: "0 10px" }}> {"$" + totalPrice}</a>
         </div>
       </header>
     );
@@ -158,44 +129,27 @@ export default function Header(props) {
           }}
         >
           <div style={{ flex: 1 }}>
-            <h3 className ="clickable" onClick = {()=>{navigate("/")}}>
+            <h3 onClick = {()=>{navigate("/")}}>
                <b>Chuwa</b> <small>Management</small>
             </h3>
           </div>
 
           <div
-          style={{
-            flex: 1,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-end",
-            flexWrap: "nowrap",
-          }}
-        >
-            <span className="notification">
-          <ManageAccountsOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayUser}/>
-          </span>
-          {user.userName !== null?
-          (<span className ="clickable" style={{ margin: "0 10px", whiteSpace:"nowrap"}} onClick={handleSignOut}>
-             Sign Out
-          </span>) :
-            (
-            <span className ="clickable" style={{ margin: "0 10px",whiteSpace:"nowrap" }} onClick={()=>{navigate("/signin")}}>
-              Sign in
-            </span>
-            )
-          }
-           {user.shoppingCart.length !== 0 ?
-           (  <span className="notification">
-           <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
-           <span className="badge">{user.shoppingCart.length}</span>
-         </span>)
-           :
-           (  <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
-          }
-        
-          <a style={{ margin: "0 10px" }}> {"$" + totalPrice.toFixed(2)}</a>
-        </div>
+            style={{
+              flex: 1,
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "flex-end",
+              flexWrap: "nowrap",
+            }}
+          >
+            <ManageAccountsOutlinedIcon className="icon" fontSize="medium" />
+            <a style={{ margin: "0 10px" }}>
+              {props.userName ? "Logout" : "Login"}
+            </a>
+            <ShoppingCartOutlinedIcon className="icon" fontSize="medium" />
+            <a style={{ margin: "0 10px" }}>{"$" + totalPrice}</a>
+          </div>
         </div>
         <Paper
           component="form"

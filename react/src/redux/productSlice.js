@@ -1,19 +1,8 @@
 import { createSlice,createAsyncThunk  } from "@reduxjs/toolkit";
 
-export const fetchProducts = createAsyncThunk('product/fetchProducts', async (parameters) => {
-
-  const url = (parameters) ? ("http://localhost:4000/product"+"?page=" + parameters.page +"&limit= " + parameters.limit) : "http://localhost:4000/product"
-  const response = await fetch(url)
-  .then((response) => 
-  {
-    if(response.ok) {
-      return response.json()
-    }
-    else
-    {
-      return response.text().then(text => { throw new Error(text) });
-    }
-  })
+export const fetchProducts = createAsyncThunk('product/fetchProducts', async () => {
+  const response = await fetch("http://localhost:4000/product")
+  .then((response) => response.json())
   return response;
 })
 export const updateProduct = createAsyncThunk('product/updateProduct', async ({product,id}) => {
@@ -74,8 +63,7 @@ export const productSlice = createSlice({
       // doesn't actually mutate the state because it uses the immer library,
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
-      console.log(action)
-      state.products = action.payload
+      state.products = action.payload 
     },
   },
   extraReducers(builder) {
@@ -86,16 +74,14 @@ export const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        console.log("fetch products succeed:")
-        console.log(action)
+        
         // Add any fetched posts to the array
         state.products = action.payload
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
-        console.log("fetch products failed:")
-        console.log(action.error.message)
+        console.log( action.error.message)
       })
       .addCase(createProduct.pending, (state, action) => {
         state.status = 'loading'
@@ -103,32 +89,28 @@ export const productSlice = createSlice({
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.status = 'succeeded'  
-        console.log("creat products succeed:")
-        console.log( action)      
+        console.log(action)      
         // Add any fetched posts to the array
         state.products.push(action.payload)
       })
       .addCase(createProduct.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
-        console.log('creat products failed:')
-        console.log(action.error.message)
+        console.log( action.error.message)
       }).addCase(updateProduct.pending, (state, action) => {
         state.status = 'loading'
         console.log('updating products')
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.status = 'succeeded'  
-        console.log('update products succeed:')   
-        console.log(action)   
+        console.log(action)      
         // Add any fetched posts to the array
        
       })
       .addCase(updateProduct.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
-        console.log( 'update products failed:')
-        console.log(action.error.message)
+        console.log( action.error.message)
       })
   }
 });

@@ -18,7 +18,7 @@ const getOneProduct = async (req, res) => {
     res.status(200).json(product);
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ message: "Error on getting the product" + err.message });
+    res.status(500).json({ message: "Error on getting the product" });
   }
 };
 
@@ -38,7 +38,7 @@ const createProduct = async (req, res) => {
     res.status(200).json({ message: "Product created successfully!" });
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ message: "Error on creating new product." + err.message });
+    res.status(500).json({ message: "Error on creating new product." });
   }
 };
 
@@ -58,7 +58,7 @@ const updateProduct = async (req, res) => {
     res.status(200).json(product);
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ message: "Error on updating product" + err.message});
+    res.status(500).json({ message: "Error on updating product" });
   }
 };
 
@@ -80,14 +80,14 @@ const deleteProduct = async (req, res) => {
     res.status(200).json({ message: "Product deleted" });
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ message: "Error on deleting the product" + err.message});
+    res.status(500).json({ message: "Error on deleting the product" });
   }
 };
 
 const getProducts = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
-  
+  // console.log(page, limit);
   // const result = {};
 
   startIndex = (page - 1) * limit;
@@ -110,9 +110,9 @@ const getProducts = async (req, res) => {
   try {
     result = await Product.find().limit(limit).skip(startIndex).exec();
     res.status(200).json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ Message: "Error on getting Products:" + err.message });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ Message: "No results found on current page" });
   }
 };
 
