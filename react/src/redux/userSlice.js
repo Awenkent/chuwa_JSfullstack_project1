@@ -1,6 +1,6 @@
 import { createSlice,createAsyncThunk  } from "@reduxjs/toolkit";
 
-export const fetchUser = createAsyncThunk('user/fetchUsers', async () => {
+export const fetchUser = createAsyncThunk('user/fetchUsers', async (defaultUser) => {
     if(localStorage.getItem("token"))
     {
       console.log("founded token")
@@ -16,8 +16,8 @@ export const fetchUser = createAsyncThunk('user/fetchUsers', async () => {
 
           }).then(res => {
           if(res.ok) {  
+           
             return res.json()
-          // handle the response
           }
           else if(res.status === 401)
           {
@@ -27,30 +27,32 @@ export const fetchUser = createAsyncThunk('user/fetchUsers', async () => {
           }
           else
           {
-              console.log(res.status);
               return res.text().then(text => { throw new Error(text) });
           }
         }) .catch(error => {
               console.log("The error is: " + error);
+              throw new Error("Connection failed")
              // alert("Your session is ended, please login again.");
          });
-         console.log(response)
-         
+        
+         if(defaultUser)
+         {
+            
+          response.originalCart = defaultUser.shoppingCart
+         }
+        
          return response;
     }
     else
     {
-      return {
-        userName: null,
-        shoppingCart: [],
-        totalPrice: 0,
-        role: "Regular",
-      };
+      throw new Error("No token founded")
     }
 })
 
 export const updateUser = createAsyncThunk('product/updateUser', async (user) => {
   const token = localStorage.getItem("token");
+  if(token)
+  {
   const response = fetch("http://localhost:4000/user",{
     method:'PUT',
     headers:{
@@ -60,8 +62,34 @@ export const updateUser = createAsyncThunk('product/updateUser', async (user) =>
     body: JSON.stringify(user),
     mode:'cors',
     cache:'default'
-  }) .then((response) => response.json())
-  return response;
+  }).then(res => {
+    if(res.ok) {  
+     
+      return res.json()
+    }
+    else if(res.status === 401)
+    {
+       alert("Your session is ended, please login again.");
+       localStorage.removeItem("token");
+       window.location.href = "/";
+    }
+    else
+    {
+        return res.text().then(text => { throw new Error(text) });
+    }
+  }) .catch(error => {
+        console.log("The error is: " + error);
+        throw new Error("Connection failed")
+       // alert("Your session is ended, please login again.");
+   });
+
+   
+    return response;
+  }
+  else
+  {
+    throw new Error("No token founded")
+  }
 })
 
 
@@ -73,7 +101,8 @@ const defaultState = {
   role: "Regular",
   },
   displayUser:"none",
-  displayCart:"none"
+  displayCart:"none",
+  cartMerged: false,
 }
 export const userSlice = createSlice({
   name: "user",
@@ -91,6 +120,9 @@ export const userSlice = createSlice({
       state.user.totalPrice = action.payload.shoppingCart.reduce((currentPrice, product) => {
         return currentPrice + Number(product.price);
       }, 0);
+    },
+    setCartMerge: (state, action) => {
+      state.cartMerged = false
     },
     setCart: (state, action) => {
       state.user.shoppingCart = action.payload;
@@ -115,15 +147,25 @@ export const userSlice = createSlice({
         console.log('loading user')
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
-        state.status = 'succeeded'    
+        console.log('fetch user successful')
+        console.log(action.payload)
+        console.log(state)
+        if(action.payload.originalCart)
+        {
+          console.log("merge cart")
+          state.cartMerged = true
+          state.user.shoppingCart = [...action.payload.originalCart,...action.payload.shoppingCart];
+        }
+        else
+        {
+          state.cartMerged = false
+          state.user.shoppingCart = action.payload.shoppingCart;
+        }
         state.user.userName = action.payload.userName;
-        state.user.shoppingCart = action.payload.shoppingCart;
         state.user.role = action.payload.role;
         state.user.totalPrice = action.payload.shoppingCart.reduce((currentPrice, product) => {
           return currentPrice + Number(product.price);
         }, 0);
-        // Add any fetched posts to the array
-       
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.status = 'failed'
@@ -150,7 +192,7 @@ export const userSlice = createSlice({
   }
 });
 
-export const { setUser, setCart,setDisplayUser ,setDisplayCart} = userSlice.actions;
+export const { setUser, setCart,setDisplayUser,setCartMerge ,setDisplayCart} = userSlice.actions;
 
 
 // The function below is called a selector and allows us to select a value from
@@ -164,4 +206,5 @@ export const selectUser = (state ) => state.user.user;
 export const selectDisplayUser = (state) => state.user.displayUser;
 export const selectDisplayCart = (state) => state.user.displayCart;
 export const selectWholeUser = (state) => state;
+export const selectCartMerged = (state) => state.user.cartMerged
 export default userSlice.reducer;

@@ -1,5 +1,5 @@
 import React from "react";
-import { useState,useRef } from "react";
+import { useState,useRef,useEffect } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
@@ -10,7 +10,8 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
-import {useDispatch } from "react-redux";
+
+import { useSelector, useDispatch } from "react-redux";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { TextareaAutosize as BaseTextareaAutosize } from "@mui/base/TextareaAutosize";
@@ -18,11 +19,25 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useNavigate,useLocation } from "react-router-dom";
 import {
+  setUser,
+  fetchUser,
+  selectCartMerged,
+  selectCart,
+  updateUser,
+  selectUser,
+  setCartMerge,
+  selectDisplayUser,
+  selectDisplayCart,
+  setDisplayUser,
+  setDisplayCart,
+  selectWholeUser
+} from "../redux/userSlice";
+import {
   setProducts,
-  updateProduct,
   createProduct,
   fetchProducts,
   selectProducts,
+  updateProduct
 } from "../redux/productSlice";
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -99,8 +114,10 @@ const TextareaAutosize = styled(BaseTextareaAutosize)(({ theme }) => ({
   },
 }));
 export default function productManage(props) {
-
+  const cart = useSelector(selectCart);
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const location = useLocation();
   const [productName, setProductName] = useState(location.state?location.state.product.productName:"")
   const [productDescription, setProductDescription]= useState(location.state?location.state.product.description:"")
@@ -109,9 +126,76 @@ export default function productManage(props) {
   const [productQuantity, setProductQuantity]= useState(location.state?location.state.product.quantity:"")
   const [productImageLink, setProductImageLink]= useState(location.state?location.state.product.imageLink:"")
   const [imagePreview,setImagePreview] = useState(location.state?location.state.product.imageLink:"https://preyash2047.github.io/assets/img/no-preview-available.png?h=824917b166935ea4772542bec6e8f636")
-  console.log(location.state)
+  const [errorState, setErrorState] = useState({
+    errorCount :0,
+    productNameError: "",
+    descriptionError: "",
+    categoryError: "",
+    priceError: "",
+    imageLinkError: "",
+    quantityError: "",
+  });
  const handleProductCreation = ()=>
  {
+  let errorObj={
+    errorCount :0,
+    productNameError: "",
+    descriptionError: "",
+    categoryError: "",
+    priceError: "",
+    imageLinkError: "",
+    quantityError: "",
+  };
+
+  if(!productName)
+  {
+    errorObj.errorCount += 1;
+    errorObj.productNameError = "Product Name cannot be empty."
+  }
+
+  if(!productCategory)
+  {
+    errorObj.errorCount += 1;
+    errorObj.categoryError = "category Name cannot be empty."
+  }
+
+  if(!productPrice)
+  {
+    errorObj.errorCount += 1;
+    errorObj.priceError = "Price cannot be empty."
+  }else if(productPrice <= 0)
+  {
+    errorObj.errorCount += 1;
+    errorObj.priceError = "Price should be at least greater than 0."
+  }
+
+  if(!productImageLink)
+  {
+    errorObj.errorCount += 1;
+    errorObj.imageLinkError = "ImageLink cannot be empty."
+  }
+
+  if(!productQuantity)
+  {
+    errorObj.errorCount += 1;
+    errorObj.quantityError = "Quantity cannot be empty."
+  }else if(productQuantity <= 0)
+  {
+    errorObj.errorCount += 1;
+    errorObj.quantityError = "Quantity shoud be at least 1."
+  }
+
+
+
+  if(errorObj.errorCount > 0)
+  {
+    setErrorState(()=>{
+      return errorObj;
+    })
+    alert("One or more input is invalid, please try again")
+    return;
+  }
+
   let productObj = {
     productName: productName,
     description:productDescription,
@@ -120,7 +204,17 @@ export default function productManage(props) {
     imageLink:productImageLink,
     quantity: productQuantity
   };
-  location.state? dispatch( updateProduct({product: productObj,id : location.state.product._id})) : dispatch(createProduct(productObj))
+  location.state? 
+  dispatch( updateProduct({product: productObj,id : location.state.product._id})).then(()=>{
+    alert("product updated!")
+    navigate("/")
+  })
+  
+  : dispatch(createProduct(productObj)).then(()=>{
+    alert("product created!")
+    navigate("/")
+  })
+  
  }
  const handleProductImageLinkUpload = ()=>
  {
@@ -163,13 +257,21 @@ export default function productManage(props) {
   
     console.log("handleProductImageLinkChange")
     setProductImageLink(e.target.value)
-    
 
   }
 
-
+console.log(location.state)
   const matches = useMediaQuery("(min-width:600px)");
-
+  useEffect(() => {
+   
+    if(user.userName === null)
+    {
+      dispatch(fetchUser()); 
+      dispatch(fetchProducts());
+    }
+ 
+   
+  }, []);
 
 
   if (matches) {
@@ -185,7 +287,7 @@ export default function productManage(props) {
         >
           <div style={{ textAlign: "center" }}>
             <Box
-              component="div"
+              component="form"
               sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -199,14 +301,14 @@ export default function productManage(props) {
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Name
                 </InputLabel>
-                <BootstrapInput key={1} id="name-input" value = {productName} onChange={handleProductNameChange}/>
+                <TextField style={{ marginTop: "20px" }} size="small" id="name-input" value = {productName} onChange={handleProductNameChange} error = {!!errorState.productNameError} helperText={errorState.productNameError}/>
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Description
                 </InputLabel>
-                <TextareaAutosize aria-label="empty textarea" minRows={8} value = {productDescription} onChange={handleProductDescriptionChange}/>
+                <TextareaAutosize aria-label="empty textarea" minRows={8} value = {productDescription} onChange={handleProductDescriptionChange} />
               </FormControl>
               <div
                 style={{
@@ -220,13 +322,13 @@ export default function productManage(props) {
                   <InputLabel shrink htmlFor="bootstrap-input">
                     Category
                   </InputLabel>
-                  <BootstrapInput id="category-input" value = {productCategory} onChange={handleProductCategoryChange}/>
+                  <TextField id="category-input" style={{ marginTop: "20px" }} size="small" value = {productCategory} onChange={handleProductCategoryChange} error = {!!errorState.categoryError} helperText={errorState.categoryError}/>
                 </FormControl>
                 <FormControl variant="standard" fullWidth>
                   <InputLabel shrink htmlFor="bootstrap-input">
                     Price
                   </InputLabel>
-                  <BootstrapInput id="price-input" value = {productPrice} onChange={handleProductPriceChange}/>
+                  <TextField id="price-input" style={{ marginTop: "20px" }} size="small" value = {productPrice} onChange={handleProductPriceChange} error = {!!errorState.priceError} helperText={errorState.priceError}/>
                 </FormControl>
               </div>
 
@@ -246,7 +348,7 @@ export default function productManage(props) {
                   <InputLabel shrink htmlFor="bootstrap-input">
                     In Stock Quantity
                   </InputLabel>
-                  <BootstrapInput id="quantity-input" value = {productQuantity} onChange={handleProductQuantityChange}/>
+                  <TextField id="quantity-input" style={{ marginTop: "20px" }} size="small" value = {productQuantity} onChange={handleProductQuantityChange} error = {!!errorState.quantityError} helperText={errorState.quantityError}/>
                 </FormControl>
                 <FormControl
                   variant="standard"
@@ -258,7 +360,12 @@ export default function productManage(props) {
                   </InputLabel>
                   <BootstrapInput
                     id="outlined-adornment-password"
-                    value = {productImageLink} onChange={handleProductImageLinkChange}
+                    style={{ marginTop: "20px" }} 
+                    size="small"
+                    value = {productImageLink} 
+                    error = {!!errorState.imageLinkError} 
+                    helperText={errorState.imageLinkError}
+                    onChange={handleProductImageLinkChange}
                     endAdornment={
                       <InputAdornment position="end">
                         <Button
@@ -316,7 +423,7 @@ export default function productManage(props) {
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Name
                 </InputLabel>
-                <BootstrapInput id="name-input" value = {productName} onChange={handleProductNameChange} />
+                <TextField id="name-input" style={{ marginTop: "20px" }} size="small" value = {productName} onChange={handleProductNameChange} error = {!!errorState.productNameError} helperText={errorState.productNameError}/>
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
@@ -330,20 +437,20 @@ export default function productManage(props) {
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Category
                 </InputLabel>
-                <BootstrapInput id="category-input" value = {productCategory} onChange={handleProductCategoryChange}/>
+                <TextField id="category-input" style={{ marginTop: "20px" }} size="small" value = {productCategory} onChange={handleProductCategoryChange}/>
               </FormControl>
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Price
                 </InputLabel>
-                <BootstrapInput id="price-input" value = {productPrice} onChange={handleProductPriceChange}/>
+                <TextField id="price-input" style={{ marginTop: "20px" }} size="small" value = {productPrice} onChange={handleProductPriceChange} error = {!!errorState.priceError} helperText={errorState.priceError}/>
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   In Stock Quantity
                 </InputLabel>
-                <BootstrapInput id="quantity-input" value = {productQuantity} onChange={handleProductQuantityChange}/>
+                <TextField id="quantity-input" style={{ marginTop: "20px" }} size="small" value = {productQuantity} onChange={handleProductQuantityChange} error = {!!errorState.quantityError} helperText={errorState.quantityError}/>
               </FormControl>
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="imageLink-input">
@@ -351,12 +458,16 @@ export default function productManage(props) {
                 </InputLabel>
                 <BootstrapInput
                   id="imageLink_input"
+                  style={{ marginTop: "20px" }} size="small"
+                  error = {!!errorState.imageLinkError} 
+                  helperText={errorState.imageLinkError}
                   value = {productImageLink} onChange={handleProductImageLinkChange}
                   endAdornment={
                     <InputAdornment position="end">
                       <Button
                         size="small"
                         component="label"
+                        
                         role={undefined}
                         variant="contained"
                         tabIndex={-1}
