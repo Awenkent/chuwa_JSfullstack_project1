@@ -1,13 +1,14 @@
-import {render, screen} from '@testing-library/react'
+import {render, screen,cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import Auth from "../components/auth"
+import Auth from "../features/auth"
+
 import '@testing-library/jest-dom'
 const mockUsedNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
    ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockUsedNavigate,
 }));
-
+afterEach(cleanup);
 import App from '../App'
 
 /* */
@@ -38,3 +39,9 @@ test('loads and displays title(signup)', async () => {
   // ASSERT
   expect(title).toHaveTextContent('Change Password')
 })
+
+it("should take a snapshot", () => {
+  const { asFragment } = render(<App />);
+  expect(asFragment(<App />)).toMatchSnapshot();
+});
+

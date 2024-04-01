@@ -1,5 +1,5 @@
 import React from "react";
-import { useState,useRef } from "react";
+import { useState,useRef,useEffect } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
@@ -10,7 +10,8 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
-import {useDispatch } from "react-redux";
+
+import { useSelector, useDispatch } from "react-redux";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { TextareaAutosize as BaseTextareaAutosize } from "@mui/base/TextareaAutosize";
@@ -18,11 +19,25 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useNavigate,useLocation } from "react-router-dom";
 import {
+  setUser,
+  fetchUser,
+  selectCartMerged,
+  selectCart,
+  updateUser,
+  selectUser,
+  setCartMerge,
+  selectDisplayUser,
+  selectDisplayCart,
+  setDisplayUser,
+  setDisplayCart,
+  selectWholeUser
+} from "../redux/userSlice";
+import {
   setProducts,
-  updateProduct,
   createProduct,
   fetchProducts,
   selectProducts,
+  updateProduct
 } from "../redux/productSlice";
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -99,7 +114,8 @@ const TextareaAutosize = styled(BaseTextareaAutosize)(({ theme }) => ({
   },
 }));
 export default function productManage(props) {
-
+  const cart = useSelector(selectCart);
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -241,13 +257,21 @@ export default function productManage(props) {
   
     console.log("handleProductImageLinkChange")
     setProductImageLink(e.target.value)
-    
 
   }
 
 console.log(location.state)
   const matches = useMediaQuery("(min-width:600px)");
-
+  useEffect(() => {
+   
+    if(user.userName === null)
+    {
+      dispatch(fetchUser()); 
+      dispatch(fetchProducts());
+    }
+ 
+   
+  }, []);
 
 
   if (matches) {

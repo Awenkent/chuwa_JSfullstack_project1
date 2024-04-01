@@ -69,6 +69,8 @@ export default function Header(props) {
     localStorage.removeItem("token");
     window.location.replace("/");
 }
+
+
   if (matches) {
     return (
       <header
@@ -83,7 +85,7 @@ export default function Header(props) {
         }}
       >
         <div style={{ flex: 1 }}>
-        <h3 onClick = {()=>{navigate("/")}}>
+        <h3 className ="clickable" onClick = {()=>{navigate("/")}}>
             <b>Chuwa</b> <small>Management</small>
           </h3>
         </div>
@@ -115,29 +117,29 @@ export default function Header(props) {
             flexWrap: "nowrap",
           }}
         >
-            <span class="notification">
+            <span className="notification">
           <ManageAccountsOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayUser}/>
           </span>
           {user.userName !== null?
-          (<span class ="clickable" style={{ margin: "0 10px" }} onClick={handleSignOut}>
+          (<span className ="clickable" style={{ margin: "0 10px" ,whiteSpace:"nowrap"}} onClick={handleSignOut}>
              Sign Out
           </span>) :
             (
-            <span class ="clickable" style={{ margin: "0 10px" }} onClick={()=>{navigate("/signin")}}>
+            <span className ="clickable" style={{ margin: "0 10px",whiteSpace:"nowrap" }} onClick={()=>{navigate("/signin")}}>
               Sign in
             </span>
             )
           }
            {user.shoppingCart.length !== 0 ?
-           (  <span class="notification">
+           (  <span className="notification">
            <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
-           <span class="badge">{user.shoppingCart.length}</span>
+           <span className="badge">{user.shoppingCart.length}</span>
          </span>)
            :
            (  <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
           }
         
-          <a style={{ margin: "0 10px" }}> {"$" + totalPrice}</a>
+          <a style={{ margin: "0 10px" }}> ${totalPrice.toFixed(2)}</a>
         </div>
       </header>
     );
@@ -156,7 +158,7 @@ export default function Header(props) {
           }}
         >
           <div style={{ flex: 1 }}>
-            <h3 onClick = {()=>{navigate("/")}}>
+            <h3 className ="clickable" onClick = {()=>{navigate("/")}}>
                <b>Chuwa</b> <small>Management</small>
             </h3>
           </div>
@@ -170,29 +172,29 @@ export default function Header(props) {
             flexWrap: "nowrap",
           }}
         >
-            <span class="notification">
+            <span className="notification">
           <ManageAccountsOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayUser}/>
           </span>
           {user.userName !== null?
-          (<span class ="clickable" style={{ margin: "0 10px" }} onClick={handleSignOut}>
+          (<span className ="clickable" style={{ margin: "0 10px", whiteSpace:"nowrap"}} onClick={handleSignOut}>
              Sign Out
           </span>) :
             (
-            <span class ="clickable" style={{ margin: "0 10px" }} onClick={()=>{navigate("/signin")}}>
+            <span className ="clickable" style={{ margin: "0 10px",whiteSpace:"nowrap" }} onClick={()=>{navigate("/signin")}}>
               Sign in
             </span>
             )
           }
            {user.shoppingCart.length !== 0 ?
-           (  <span class="notification">
+           (  <span className="notification">
            <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
-           <span class="badge">{user.shoppingCart.length}</span>
+           <span className="badge">{user.shoppingCart.length}</span>
          </span>)
            :
            (  <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
           }
         
-          <a style={{ margin: "0 10px" }}> {"$" + totalPrice}</a>
+          <a style={{ margin: "0 10px" }}> {"$" + totalPrice.toFixed(2)}</a>
         </div>
         </div>
         <Paper
