@@ -45,7 +45,7 @@ export default function ProductDetailsPage() {
 
   const handleAddToCart = (e) => {
     if (Number(location.state.quantity) <= Number(onCart)) {
-      alert(location.state.productName + " out of stock!");
+      alert(location.state.name + " out of stock!");
       return;
     }
     let userObj = {
@@ -279,7 +279,7 @@ export default function ProductDetailsPage() {
   } else {
     return (
       <>
-        <Typography variant="h2">Product Details</Typography>
+       <h2> Product Details</h2>
         <Card
           sx={{
             width: "95%",
@@ -311,7 +311,7 @@ export default function ProductDetailsPage() {
               {location.state.productObject.productName}
             </Typography>
             <Typography variant="h5" component="p">
-              ${location.state.productObject.price}
+            <span>${location.state.price} {Number(location.state.quantity) <= Number(onCart)? (<span style={{backgroundColor: "pink", color: "red"}}>Out of Stock</span>): ""}</span>
             </Typography>
             <Typography variant="body1" component="p">
               {location.state.productObject.description}
