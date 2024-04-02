@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useMediaQuery } from "@mui/material";
+import UserCart from "../components/userCart";
+import UserProfile from "../components/userProfile";
 
 import {
   setCart,
@@ -32,6 +34,8 @@ import {
 } from "../redux/productSlice";
 
 export default function ProductDetailsPage() {
+  const displayUser = useSelector(selectDisplayUser);
+  const displayCart = useSelector(selectDisplayCart);
   const matches = useMediaQuery("(min-width:700px)");
   const cart = useSelector(selectCart);
   const user = useSelector(selectUser);
@@ -103,6 +107,47 @@ export default function ProductDetailsPage() {
     return (
       <>
         <div style={{ boxSizing: "border-box" }}>
+          <div
+            style={{
+              position: "fixed",
+              display: displayUser,
+              minHeight: "1000px",
+              width: "100%",
+              height: "100%",
+              zIndex: 100,
+              backgroundColor: "rgba(100,100,100,0.5)",
+            }}
+          >
+            <UserProfile
+              userName={user.userName}
+              totalPrice={user.totalPrice}
+              role={user.role}
+              handleClick={() => {
+                dispatch(setDisplayUser("none"));
+              }}
+              handleChangePssword={() => {
+                navigate("/changepassword");
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              position: "absolute",
+              display: displayCart,
+              width: "100%",
+              height: "100%",
+              zIndex: 100,
+              backgroundColor: "rgba(100,100,100,0.5)",
+            }}
+          >
+            <UserCart
+              cart={cart}
+              handleClick={() => {
+                dispatch(setDisplayCart("none"));
+              }}
+            />
+          </div>
           <h2> Product Details</h2>
           <Card
             sx={{
