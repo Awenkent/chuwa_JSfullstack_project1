@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "@material-ui/core";
-import CartItem from "./cartItem.js"; 
-import { Wrapper } from "../styles/cart.styles"; 
+import CartItem from "./cartItem.js";
+import { Wrapper } from "../styles/cart.styles";
 
-const Cart = ({ cartItems, addToCart, removeFromCart,removeAllFromCart }) => {
+const Cart = ({ cartItems, addToCart, removeFromCart, removeAllFromCart }) => {
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -40,23 +40,38 @@ const Cart = ({ cartItems, addToCart, removeFromCart,removeAllFromCart }) => {
       {couponApplied && <h3>Discount: $20.00</h3>}
       <h2>Total: ${(discountedTotal + tax).toFixed(2)}</h2>
       {!couponApplied && (
-        <div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <input
+            style={{ height: "30px", width: "200px" }}
             type="text"
             placeholder="Enter coupon code"
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value)}
           />
-          <Button variant="contained" color="primary" onClick={applyCoupon}>
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: "rgb(80,72,229)",
+              color: "white",
+              width: "200px",
+            }}
+            onClick={applyCoupon}
+          >
             Apply Coupon
           </Button>
         </div>
       )}
-      <Button variant="contained" color="primary"  onClick={() => alert("Checkout button wait for implementaton!")}>
+      <Button
+        variant="contained"
+        style={{
+          backgroundColor: "rgb(80,72,229)",
+          color: "white",
+          marginTop: "30px",
+        }}
+        onClick={() => alert("Checkout button wait for implementaton!")}
+      >
         Check out
       </Button>
-
-
     </Wrapper>
   );
 };

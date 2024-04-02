@@ -1,5 +1,5 @@
 import { Button, Link } from "@material-ui/core";
-import { Wrapper } from "../styles/cartItem.styles"; 
+import { Wrapper } from "../styles/cartItem.styles";
 
 const CartItem = ({ item, addToCart, removeFromCart, removeAllLink }) => {
   return (
@@ -12,8 +12,8 @@ const CartItem = ({ item, addToCart, removeFromCart, removeAllLink }) => {
         </div>
         <div className="buttons">
           <Button
-            color="primary"
-            size="small"
+            style={{ backgroundColor: "rgb(80,72,229)", color: "white" }}
+            size="ex-small"
             disableElevation
             variant="contained"
             onClick={() => removeFromCart(item.id)}
@@ -22,7 +22,7 @@ const CartItem = ({ item, addToCart, removeFromCart, removeAllLink }) => {
           </Button>
           <p>{item.amount}</p>
           <Button
-            color="primary"
+            style={{ backgroundColor: "rgb(80,72,229)", color: "white" }}
             size="small"
             disableElevation
             variant="contained"
@@ -32,7 +32,7 @@ const CartItem = ({ item, addToCart, removeFromCart, removeAllLink }) => {
           </Button>
         </div>
         {removeAllLink && (
-          <Link onClick={() => removeAllLink(item.id)}>Remove the product</Link>
+          <Link onClick={() => removeAllLink(item.id)}>Remove</Link>
         )}
       </div>
       <img src={item.imageLink} alt={item.productName} />
@@ -41,4 +41,3 @@ const CartItem = ({ item, addToCart, removeFromCart, removeAllLink }) => {
 };
 
 export default CartItem;
-
