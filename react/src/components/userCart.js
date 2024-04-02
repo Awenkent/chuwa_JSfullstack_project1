@@ -191,12 +191,6 @@ export default function UserCart(props) {
                         </h3>
                       </div>
                       <Button
-                        variant="contained"
-                        style={{
-                          backgroundColor: "rgb(80,72,229)",
-                          color: "white",
-                          width: "90px",
-                        }}
                         onClick={() => {
                           handleRemoveItem(product._id);
                         }}
