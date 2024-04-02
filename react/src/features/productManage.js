@@ -1,5 +1,5 @@
 import React from "react";
-import { useState,useRef,useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
@@ -17,7 +17,10 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { TextareaAutosize as BaseTextareaAutosize } from "@mui/base/TextareaAutosize";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import UserCart from "../components/userCart";
+import UserProfile from "../components/userProfile";
+
 import {
   setUser,
   fetchUser,
@@ -30,7 +33,7 @@ import {
   selectDisplayCart,
   setDisplayUser,
   setDisplayCart,
-  selectWholeUser
+  selectWholeUser,
 } from "../redux/userSlice";
 import {
   setProducts,
@@ -39,7 +42,7 @@ import {
   fetchProductCount,
   fetchProducts,
   selectProducts,
-  updateProduct
+  updateProduct,
 } from "../redux/productSlice";
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -116,21 +119,39 @@ const TextareaAutosize = styled(BaseTextareaAutosize)(({ theme }) => ({
   },
 }));
 export default function productManage(props) {
+  const displayUser = useSelector(selectDisplayUser);
+  const displayCart = useSelector(selectDisplayCart);
   const cart = useSelector(selectCart);
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const [productName, setProductName] = useState(location.state?location.state.product.productName:"")
-  const [productDescription, setProductDescription]= useState(location.state?location.state.product.description:"")
-  const [productCategory, setProductCategory]= useState(location.state?location.state.product.category:"")
-  const [productPrice, setProductPrice]= useState(location.state?location.state.product.price:"")
-  const [productQuantity, setProductQuantity]= useState(location.state?location.state.product.quantity:"")
-  const [productImageLink, setProductImageLink]= useState(location.state?location.state.product.imageLink:"")
-  const [imagePreview,setImagePreview] = useState(location.state?location.state.product.imageLink:"https://preyash2047.github.io/assets/img/no-preview-available.png?h=824917b166935ea4772542bec6e8f636")
+
+  const [productName, setProductName] = useState(
+    location.state ? location.state.product.productName : ""
+  );
+  const [productDescription, setProductDescription] = useState(
+    location.state ? location.state.product.description : ""
+  );
+  const [productCategory, setProductCategory] = useState(
+    location.state ? location.state.product.category : ""
+  );
+  const [productPrice, setProductPrice] = useState(
+    location.state ? location.state.product.price : ""
+  );
+  const [productQuantity, setProductQuantity] = useState(
+    location.state ? location.state.product.quantity : ""
+  );
+  const [productImageLink, setProductImageLink] = useState(
+    location.state ? location.state.product.imageLink : ""
+  );
+  const [imagePreview, setImagePreview] = useState(
+    location.state
+      ? location.state.product.imageLink
+      : "https://preyash2047.github.io/assets/img/no-preview-available.png?h=824917b166935ea4772542bec6e8f636"
+  );
   const [errorState, setErrorState] = useState({
-    errorCount :0,
+    errorCount: 0,
     productNameError: "",
     descriptionError: "",
     categoryError: "",
@@ -138,303 +159,353 @@ export default function productManage(props) {
     imageLinkError: "",
     quantityError: "",
   });
-  const handleDelete = ()=>{
-    dispatch(deleteProducts(location.state.product._id)).then((res)=>{
-      if(res.error)
-      { 
-        alert( res.error.message) 
+  const handleDelete = () => {
+    dispatch(deleteProducts(location.state.product._id)).then((res) => {
+      if (res.error) {
+        alert(res.error.message);
+      } else {
+        alert("product deleted!");
+        navigate("/");
       }
-      else
-      {
-        alert("product deleted!")
-        navigate("/")
-      }
-    })  
-  }
- const handleProductCreation = ()=>
- {
-  let errorObj={
-    errorCount :0,
-    productNameError: "",
-    descriptionError: "",
-    categoryError: "",
-    priceError: "",
-    imageLinkError: "",
-    quantityError: "",
+    });
+  };
+  const handleProductCreation = () => {
+    let errorObj = {
+      errorCount: 0,
+      productNameError: "",
+      descriptionError: "",
+      categoryError: "",
+      priceError: "",
+      imageLinkError: "",
+      quantityError: "",
+    };
+
+    if (!productName) {
+      errorObj.errorCount += 1;
+      errorObj.productNameError = "Product Name cannot be empty.";
+    }
+
+    if (!productCategory) {
+      errorObj.errorCount += 1;
+      errorObj.categoryError = "category Name cannot be empty.";
+    }
+
+    if (!productPrice) {
+      errorObj.errorCount += 1;
+      errorObj.priceError = "Price cannot be empty.";
+    } else if (productPrice <= 0) {
+      errorObj.errorCount += 1;
+      errorObj.priceError = "Price should be at least greater than 0.";
+    }
+
+    if (!productImageLink) {
+      errorObj.errorCount += 1;
+      errorObj.imageLinkError = "ImageLink cannot be empty.";
+    }
+
+    if (!productQuantity) {
+      errorObj.errorCount += 1;
+      errorObj.quantityError = "Quantity cannot be empty.";
+    } else if (productQuantity <= 0) {
+      errorObj.errorCount += 1;
+      errorObj.quantityError = "Quantity shoud be at least 1.";
+    }
+
+    if (errorObj.errorCount > 0) {
+      setErrorState(() => {
+        return errorObj;
+      });
+      alert("One or more input is invalid, please try again");
+      return;
+    }
+
+    let productObj = {
+      productName: productName,
+      description: productDescription,
+      category: productCategory,
+      price: productPrice,
+      imageLink: productImageLink,
+      quantity: productQuantity,
+    };
+    location.state
+      ? dispatch(
+          updateProduct({ product: productObj, id: location.state.product._id })
+        ).then((res) => {
+          if (res.error) {
+            alert(res.error.message);
+          } else {
+            alert("product updated!");
+            navigate("/");
+          }
+        })
+      : dispatch(createProduct(productObj)).then((res) => {
+          console.log(res);
+          if (res.error) {
+            alert(res.error.message);
+          } else {
+            alert("product created!");
+            navigate("/");
+          }
+        });
+  };
+  const handleProductImageLinkUpload = () => {
+    setImagePreview(productImageLink);
+  };
+  const handleProductNameChange = (e) => {
+    console.log("handleProductNameChange");
+    setProductName(e.target.value);
   };
 
-  if(!productName)
-  {
-    errorObj.errorCount += 1;
-    errorObj.productNameError = "Product Name cannot be empty."
-  }
-
-  if(!productCategory)
-  {
-    errorObj.errorCount += 1;
-    errorObj.categoryError = "category Name cannot be empty."
-  }
-
-  if(!productPrice)
-  {
-    errorObj.errorCount += 1;
-    errorObj.priceError = "Price cannot be empty."
-  }else if(productPrice <= 0)
-  {
-    errorObj.errorCount += 1;
-    errorObj.priceError = "Price should be at least greater than 0."
-  }
-
-  if(!productImageLink)
-  {
-    errorObj.errorCount += 1;
-    errorObj.imageLinkError = "ImageLink cannot be empty."
-  }
-
-  if(!productQuantity)
-  {
-    errorObj.errorCount += 1;
-    errorObj.quantityError = "Quantity cannot be empty."
-  }else if(productQuantity <= 0)
-  {
-    errorObj.errorCount += 1;
-    errorObj.quantityError = "Quantity shoud be at least 1."
-  }
-
-
-
-  if(errorObj.errorCount > 0)
-  {
-    setErrorState(()=>{
-      return errorObj;
-    })
-    alert("One or more input is invalid, please try again")
-    return;
-  }
-
-  let productObj = {
-    productName: productName,
-    description:productDescription,
-    category:productCategory,
-    price:productPrice,
-    imageLink:productImageLink,
-    quantity: productQuantity
+  const handleProductDescriptionChange = (e) => {
+    console.log("handleProductDescriptionChange");
+    setProductDescription(e.target.value);
   };
-  location.state? 
-  dispatch( updateProduct({product: productObj,id : location.state.product._id})).then((res)=>{
-    if(res.error)
-    { 
-      alert( res.error.message) 
-    }
-    else
-    {
-      alert("product updated!")
-      navigate("/")
-    }
-    
-  })
-  
-  : dispatch(createProduct(productObj)).then((res)=>{
-    
-    console.log(res)
-    if(res.error)
-    { 
-      alert( res.error.message) 
-    }
-    else
-    {
-    alert("product created!")
-    navigate("/")
-    }
-  })
-  
- }
- const handleProductImageLinkUpload = ()=>
- {
-    setImagePreview(productImageLink)
- }
-  const handleProductNameChange = (e) =>
-  {
-    console.log("handleProductNameChange")
-    setProductName(e.target.value)
-    
-  }
-  
-  const handleProductDescriptionChange = (e) =>
-  {
-    console.log("handleProductDescriptionChange")
-    setProductDescription(e.target.value)
-  }
-  
-  const handleProductCategoryChange = (e) =>
-  {
-    console.log("handleProductCategoryChange")
-    setProductCategory(e.target.value)
-    
-  }
 
-  const handleProductPriceChange = (e) =>
-  {
-    console.log("handleProductPriceChange")
-    setProductPrice(e.target.value)
-  }
-  
-  const handleProductQuantityChange = (e) =>
-  {
-    console.log("handleProductQuantityChange")
-    setProductQuantity(e.target.value)
-    
-  }
-  const handleProductImageLinkChange = (e) =>
-  {
-  
-    console.log("handleProductImageLinkChange")
-    setProductImageLink(e.target.value)
+  const handleProductCategoryChange = (e) => {
+    console.log("handleProductCategoryChange");
+    setProductCategory(e.target.value);
+  };
 
-  }
+  const handleProductPriceChange = (e) => {
+    console.log("handleProductPriceChange");
+    setProductPrice(e.target.value);
+  };
 
-console.log(location.state)
+  const handleProductQuantityChange = (e) => {
+    console.log("handleProductQuantityChange");
+    setProductQuantity(e.target.value);
+  };
+  const handleProductImageLinkChange = (e) => {
+    console.log("handleProductImageLinkChange");
+    setProductImageLink(e.target.value);
+  };
+
+  console.log(location.state);
   const matches = useMediaQuery("(min-width:600px)");
   useEffect(() => {
-   
-    if(user.userName === null)
-    {
-      dispatch(fetchUser()); 
+    if (user.userName === null) {
+      dispatch(fetchUser());
       dispatch(fetchProducts());
       dispatch(fetchProductCount());
     }
- 
-   
   }, []);
-
 
   if (matches) {
     return (
-      <div style={{maxWidth:"800px", margin:"0 auto"}}>
-        <h2>{location.state ?"Update Product" : "Create Product"}</h2>
+      <>
         <div
           style={{
-            padding: "20px 50px",
-            margin: "50px",
-            backgroundColor: "white",
+            position: "fixed",
+            display: displayUser,
+            minHeight: "1000px",
+            width: "100vw",
+            height: "100vh",
+            zIndex: 100,
+            backgroundColor: "rgba(100,100,100,0.5)",
           }}
         >
-          <div style={{ textAlign: "center" }}>
-            <Box
-              component="form"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                gridTemplateColumns: { sm: "1fr 1fr" },
-                gap: 3,
-              }}
-            >
-              <FormControl variant="standard" fullWidth>
-                <InputLabel shrink htmlFor="bootstrap-input">
-                  Product Name
-                </InputLabel>
-                <TextField style={{ marginTop: "20px" }} size="small" id="name-input" value = {productName} onChange={handleProductNameChange} error = {!!errorState.productNameError} helperText={errorState.productNameError}/>
-              </FormControl>
+          <UserProfile
+            userName={user.userName}
+            totalPrice={user.totalPrice}
+            role={user.role}
+            handleClick={() => {
+              dispatch(setDisplayUser("none"));
+            }}
+            handleChangePssword={() => {
+              navigate("/changepassword");
+            }}
+          />
+        </div>
 
-              <FormControl variant="standard" fullWidth>
-                <InputLabel shrink htmlFor="bootstrap-input">
-                  Product Description
-                </InputLabel>
-                <TextareaAutosize aria-label="empty textarea" minRows={8} value = {productDescription} onChange={handleProductDescriptionChange} />
-              </FormControl>
-              <div
-                style={{
-                  width: "100%",
+        <div
+          style={{
+            position: "absolute",
+            display: displayCart,
+            width: "100%",
+            height: "100%",
+            zIndex: 100,
+            backgroundColor: "rgba(100,100,100,0.5)",
+          }}
+        >
+          <UserCart
+            cart={cart}
+            handleClick={() => {
+              dispatch(setDisplayCart("none"));
+            }}
+          />
+        </div>
+        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+          <h2 style={{ margin: "0", paddingTop: "20px" }}>
+            {location.state ? "Update Product" : "Create Product"}
+          </h2>
+          <div
+            style={{
+              padding: "20px 50px",
+              margin: "50px",
+              backgroundColor: "white",
+            }}
+          >
+            <div style={{ textAlign: "center" }}>
+              <Box
+                component="form"
+                sx={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  gap: "20px",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gridTemplateColumns: { sm: "1fr 1fr" },
+                  gap: 3,
                 }}
               >
                 <FormControl variant="standard" fullWidth>
                   <InputLabel shrink htmlFor="bootstrap-input">
-                    Category
+                    Product Name
                   </InputLabel>
-                  <TextField id="category-input" style={{ marginTop: "20px" }} size="small" value = {productCategory} onChange={handleProductCategoryChange} error = {!!errorState.categoryError} helperText={errorState.categoryError}/>
-                </FormControl>
-                <FormControl variant="standard" fullWidth>
-                  <InputLabel shrink htmlFor="bootstrap-input">
-                    Price
-                  </InputLabel>
-                  <TextField id="price-input" style={{ marginTop: "20px" }} size="small" value = {productPrice} onChange={handleProductPriceChange} error = {!!errorState.priceError} helperText={errorState.priceError}/>
-                </FormControl>
-              </div>
-
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: "20px",
-                }}
-              >
-                <FormControl
-                  variant="standard"
-                  fullWidth
-                  style={{ flex: 0.75 }}
-                >
-                  <InputLabel shrink htmlFor="bootstrap-input">
-                    In Stock Quantity
-                  </InputLabel>
-                  <TextField id="quantity-input" style={{ marginTop: "20px" }} size="small" value = {productQuantity} onChange={handleProductQuantityChange} error = {!!errorState.quantityError} helperText={errorState.quantityError}/>
-                </FormControl>
-                <FormControl
-                  variant="standard"
-                  fullWidth
-                  style={{ flex: 1.25 }}
-                >
-                  <InputLabel shrink htmlFor="imageLink-input">
-                    Add Image Link
-                  </InputLabel>
-                  <BootstrapInput
-                    id="outlined-adornment-password"
-                    style={{ marginTop: "20px" }} 
+                  <TextField
+                    style={{ marginTop: "20px" }}
                     size="small"
-                    value = {productImageLink} 
-                    error = {!!errorState.imageLinkError} 
-                    helperText={errorState.imageLinkError}
-                    onChange={handleProductImageLinkChange}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <Button
-                          size="small"
-                          component="label"
-                          role={undefined}
-                          variant="contained"
-                          tabIndex={-1}
-                          onClick ={handleProductImageLinkUpload} 
-                          startIcon={<CloudUploadIcon />}
-                        >
-                          Upload
-                         
-                        </Button>
-                      </InputAdornment>
-                    }
+                    id="name-input"
+                    value={productName}
+                    onChange={handleProductNameChange}
+                    error={!!errorState.productNameError}
+                    helperText={errorState.productNameError}
                   />
                 </FormControl>
-              </div>
-              <FormControl variant="standard" fullWidth>
-              <img src={imagePreview}></img>
-              </FormControl>
-              <Button variant="contained" fullWidth onClick={handleProductCreation}>
-                   {location.state ?"Update Product" : "Add Product"}
-              </Button>
-              {location.state? <Button onClick={handleDelete}>delete Product</Button> :""}
-            </Box>
+
+                <FormControl variant="standard" fullWidth>
+                  <InputLabel shrink htmlFor="bootstrap-input">
+                    Product Description
+                  </InputLabel>
+                  <TextareaAutosize
+                    aria-label="empty textarea"
+                    minRows={8}
+                    value={productDescription}
+                    onChange={handleProductDescriptionChange}
+                  />
+                </FormControl>
+                <div
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "20px",
+                  }}
+                >
+                  <FormControl variant="standard" fullWidth>
+                    <InputLabel shrink htmlFor="bootstrap-input">
+                      Category
+                    </InputLabel>
+                    <TextField
+                      id="category-input"
+                      style={{ marginTop: "20px" }}
+                      size="small"
+                      value={productCategory}
+                      onChange={handleProductCategoryChange}
+                      error={!!errorState.categoryError}
+                      helperText={errorState.categoryError}
+                    />
+                  </FormControl>
+                  <FormControl variant="standard" fullWidth>
+                    <InputLabel shrink htmlFor="bootstrap-input">
+                      Price
+                    </InputLabel>
+                    <TextField
+                      id="price-input"
+                      style={{ marginTop: "20px" }}
+                      size="small"
+                      value={productPrice}
+                      onChange={handleProductPriceChange}
+                      error={!!errorState.priceError}
+                      helperText={errorState.priceError}
+                    />
+                  </FormControl>
+                </div>
+
+                <div
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "20px",
+                  }}
+                >
+                  <FormControl
+                    variant="standard"
+                    fullWidth
+                    style={{ flex: 0.75 }}
+                  >
+                    <InputLabel shrink htmlFor="bootstrap-input">
+                      In Stock Quantity
+                    </InputLabel>
+                    <TextField
+                      id="quantity-input"
+                      style={{ marginTop: "20px" }}
+                      size="small"
+                      value={productQuantity}
+                      onChange={handleProductQuantityChange}
+                      error={!!errorState.quantityError}
+                      helperText={errorState.quantityError}
+                    />
+                  </FormControl>
+                  <FormControl
+                    variant="standard"
+                    fullWidth
+                    style={{ flex: 1.25 }}
+                  >
+                    <InputLabel shrink htmlFor="imageLink-input">
+                      Add Image Link
+                    </InputLabel>
+                    <BootstrapInput
+                      id="outlined-adornment-password"
+                      style={{ marginTop: "20px" }}
+                      size="small"
+                      value={productImageLink}
+                      error={!!errorState.imageLinkError}
+                      helperText={errorState.imageLinkError}
+                      onChange={handleProductImageLinkChange}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <Button
+                            size="small"
+                            component="label"
+                            role={undefined}
+                            variant="contained"
+                            tabIndex={-1}
+                            onClick={handleProductImageLinkUpload}
+                            startIcon={<CloudUploadIcon />}
+                          >
+                            Upload
+                          </Button>
+                        </InputAdornment>
+                      }
+                    />
+                  </FormControl>
+                </div>
+                <FormControl variant="standard" fullWidth>
+                  <img src={imagePreview}></img>
+                </FormControl>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleProductCreation}
+                >
+                  {location.state ? "Update Product" : "Add Product"}
+                </Button>
+                {location.state ? (
+                  <Button onClick={handleDelete}>delete Product</Button>
+                ) : (
+                  ""
+                )}
+              </Box>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   } else {
     return (
-      <div style={{maxWidth:"800px", margin:"0 auto"}}>
-            <h2>{location.state ?"Update Product" : "Create Product"}</h2>
+      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        <h2>{location.state ? "Update Product" : "Create Product"}</h2>
         <div
           style={{
             padding: "20px 50px",
@@ -458,34 +529,69 @@ console.log(location.state)
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Name
                 </InputLabel>
-                <TextField id="name-input" style={{ marginTop: "20px" }} size="small" value = {productName} onChange={handleProductNameChange} error = {!!errorState.productNameError} helperText={errorState.productNameError}/>
+                <TextField
+                  id="name-input"
+                  style={{ marginTop: "20px" }}
+                  size="small"
+                  value={productName}
+                  onChange={handleProductNameChange}
+                  error={!!errorState.productNameError}
+                  helperText={errorState.productNameError}
+                />
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Product Description
                 </InputLabel>
-                <TextareaAutosize aria-label="empty textarea" minRows={8} value = {productDescription} onChange={handleProductDescriptionChange}/>
+                <TextareaAutosize
+                  aria-label="empty textarea"
+                  minRows={8}
+                  value={productDescription}
+                  onChange={handleProductDescriptionChange}
+                />
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Category
                 </InputLabel>
-                <TextField id="category-input" style={{ marginTop: "20px" }} size="small" value = {productCategory} onChange={handleProductCategoryChange}/>
+                <TextField
+                  id="category-input"
+                  style={{ marginTop: "20px" }}
+                  size="small"
+                  value={productCategory}
+                  onChange={handleProductCategoryChange}
+                />
               </FormControl>
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   Price
                 </InputLabel>
-                <TextField id="price-input" style={{ marginTop: "20px" }} size="small" value = {productPrice} onChange={handleProductPriceChange} error = {!!errorState.priceError} helperText={errorState.priceError}/>
+                <TextField
+                  id="price-input"
+                  style={{ marginTop: "20px" }}
+                  size="small"
+                  value={productPrice}
+                  onChange={handleProductPriceChange}
+                  error={!!errorState.priceError}
+                  helperText={errorState.priceError}
+                />
               </FormControl>
 
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="bootstrap-input">
                   In Stock Quantity
                 </InputLabel>
-                <TextField id="quantity-input" style={{ marginTop: "20px" }} size="small" value = {productQuantity} onChange={handleProductQuantityChange} error = {!!errorState.quantityError} helperText={errorState.quantityError}/>
+                <TextField
+                  id="quantity-input"
+                  style={{ marginTop: "20px" }}
+                  size="small"
+                  value={productQuantity}
+                  onChange={handleProductQuantityChange}
+                  error={!!errorState.quantityError}
+                  helperText={errorState.quantityError}
+                />
               </FormControl>
               <FormControl variant="standard" fullWidth>
                 <InputLabel shrink htmlFor="imageLink-input">
@@ -493,37 +599,44 @@ console.log(location.state)
                 </InputLabel>
                 <BootstrapInput
                   id="imageLink_input"
-                  style={{ marginTop: "20px" }} size="small"
-                  error = {!!errorState.imageLinkError} 
+                  style={{ marginTop: "20px" }}
+                  size="small"
+                  error={!!errorState.imageLinkError}
                   helperText={errorState.imageLinkError}
-                  value = {productImageLink} onChange={handleProductImageLinkChange}
+                  value={productImageLink}
+                  onChange={handleProductImageLinkChange}
                   endAdornment={
                     <InputAdornment position="end">
                       <Button
                         size="small"
                         component="label"
-                        
                         role={undefined}
                         variant="contained"
                         tabIndex={-1}
-                        onClick ={handleProductImageLinkUpload} 
+                        onClick={handleProductImageLinkUpload}
                         startIcon={<CloudUploadIcon />}
                       >
                         Upload
-                       
                       </Button>
                     </InputAdornment>
                   }
                 />
-
               </FormControl>
- <FormControl variant="standard" fullWidth>
-                <img  src={imagePreview}></img>
+              <FormControl variant="standard" fullWidth>
+                <img src={imagePreview}></img>
               </FormControl>
-              <Button variant="contained" fullWidth onClick={handleProductCreation}>
-              {location.state ?"Update Product" : "Add Product"}
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleProductCreation}
+              >
+                {location.state ? "Update Product" : "Add Product"}
               </Button>
-              {location.state? <Button onClick={handleDelete}>delete Product</Button> :""}
+              {location.state ? (
+                <Button onClick={handleDelete}>delete Product</Button>
+              ) : (
+                ""
+              )}
             </Box>
           </form>
         </div>
