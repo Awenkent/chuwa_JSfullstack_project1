@@ -224,7 +224,7 @@ export default function UserCart(props) {
             endAdornment={
               <InputAdornment position="end">
                 <Button
-                  size="small"
+                  size="large"
                   component="label"
                   role={undefined}
                   variant="contained"
