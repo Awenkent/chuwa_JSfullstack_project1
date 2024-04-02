@@ -25,7 +25,7 @@ const CartApp = () => {
   const dispatch = useDispatch();
 
   useEffect(()=>{
-    if(cartOn === "none"){
+    if(cartOn === "block"){
       setCartOpen(true);
     }else{
       setCartOpen(false);
