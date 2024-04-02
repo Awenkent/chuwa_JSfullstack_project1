@@ -21,7 +21,7 @@ import {
   selectDisplayCart,
   setDisplayUser,
   setDisplayCart,
-  selectWholeUser
+  selectWholeUser,
 } from "../redux/userSlice";
 import {
   setProducts,
@@ -52,16 +52,12 @@ export default function ProductDetailsPage() {
       ...user,
       shoppingCart: [...cart, location.state.productObject],
     };
-    if(user.userName === null)
-    {
-      dispatch(setUser(userObj)) 
-
-    }
-    else{
-
+    if (user.userName === null) {
+      dispatch(setUser(userObj));
+    } else {
       dispatch(updateUser(userObj));
     }
-  
+
     console.log("handleAddToCart()");
   };
 
@@ -79,16 +75,12 @@ export default function ProductDetailsPage() {
       shoppingCart: [...array],
     };
 
-    if(user.userName === null)
-    {
-      dispatch(setUser(userObj)) 
-
-    }
-    else{
-
+    if (user.userName === null) {
+      dispatch(setUser(userObj));
+    } else {
       dispatch(updateUser(userObj));
     }
-  
+
     console.log("handleRemoveFromCart()");
   };
 
@@ -100,20 +92,16 @@ export default function ProductDetailsPage() {
     console.log(e.target.dataset.productid);
   };
   useEffect(() => {
-   
-    if(user.userName === null)
-    {
-      dispatch(fetchUser()); 
+    if (user.userName === null) {
+      dispatch(fetchUser());
       dispatch(fetchProducts());
     }
- 
-   
   }, []);
   if (matches) {
     return (
       <>
-        <div style={{ boxSizing: "border-box"}}>
-        <h2> Product Details</h2>
+        <div style={{ boxSizing: "border-box" }}>
+          <h2> Product Details</h2>
           <Card
             sx={{
               width: "80%",
@@ -138,29 +126,52 @@ export default function ProductDetailsPage() {
               style={{
                 textAlign: "left",
                 height: "400px",
-                width: "40%",
-                minWidth: "300px",
+                width: "50%",
+                minWidth: "400px",
                 margin: "5%",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "flex-start",
                 alignItems: "start",
-                overflowY:"auto"
+                overflowY: "auto",
               }}
             >
-              <Typography  color="text.secondary">
-                <h4>{location.state.category}</h4>
-              </Typography>
-              <Typography color="text.secondary">
-              <h2>{location.state.name}</h2>
-              </Typography>
-              <Typography variant="h5" component="b">
-                <span>${location.state.price} {Number(location.state.quantity) <= Number(onCart)? (<span style={{backgroundColor: "pink", color: "red"}}>Out of Stock</span>): ""}</span>
-              </Typography>
-              <Typography variant="h5" color="text.secondary">
-                {location.state.description}
-              </Typography>
-
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  width: "100%",
+                }}
+              >
+                <Typography color="text.secondary">
+                  <h4 style={{ margin: "0" }}>{location.state.category}</h4>
+                </Typography>
+                <Typography color="text.secondary">
+                  <h2 style={{ margin: "0" }}>{location.state.name}</h2>
+                </Typography>
+                <Typography variant="h5" component="b">
+                  <span>
+                    ${location.state.price}{" "}
+                    {Number(location.state.quantity) <= Number(onCart) ? (
+                      <span style={{ backgroundColor: "pink", color: "red" }}>
+                        Out of Stock
+                      </span>
+                    ) : (
+                      ""
+                    )}
+                  </span>
+                </Typography>
+                <Typography variant="h5" color="text.secondary">
+                  <h5
+                    style={{
+                      minHeight: "150px",
+                      width: "100%",
+                    }}
+                  >
+                    {location.state.description}
+                  </h5>
+                </Typography>
+              </div>
 
               <div
                 style={{
@@ -173,13 +184,14 @@ export default function ProductDetailsPage() {
                 <div
                   style={{
                     backgroundColor: "rgb(80,72,229)",
-                    display: "inline-flex",
+                    display: "flex",
                     justifyContent: "space-around",
                     alignItems: "center",
                     borderRadius: "5px",
                     width: "100%",
                     height: "50px",
                     textAlign: "center",
+                    flex: "1",
                   }}
                 >
                   {onCart ? (
@@ -189,7 +201,7 @@ export default function ProductDetailsPage() {
                           width: "100%",
                           textAlign: "center",
                           textWrap: "nowrap",
-                          minWidth: "120px",
+                          minWidth: "100px",
                           minHeight: "50px",
                           display: "flex",
                           alignItems: "center",
@@ -200,7 +212,7 @@ export default function ProductDetailsPage() {
                           data-productobject={location.state.productObject}
                           style={{
                             height: "100%",
-                            width: "30px",
+                            width: "25px",
                             color: "white",
                             textAlign: "center",
                           }}
@@ -211,7 +223,7 @@ export default function ProductDetailsPage() {
                         <span
                           style={{
                             textAlign: "center",
-                            width: "60px",
+                            width: "50px",
                             color: "white",
                           }}
                         >
@@ -221,7 +233,7 @@ export default function ProductDetailsPage() {
                           data-productobject={location.state.productObject}
                           style={{
                             height: "100%",
-                            width: "30px",
+                            width: "25px",
                             color: "white",
                             textAlign: "center",
                           }}
@@ -233,17 +245,22 @@ export default function ProductDetailsPage() {
                     </>
                   ) : (
                     <>
-                      <div style={{ width: "100%" }}>
+                      <div
+                        style={{
+                          textAlign: "center",
+                          minWidth: "100px",
+                          minHeight: "50px",
+                        }}
+                      >
                         <Button
                           variant="outlined"
                           style={{
                             backgroundColor: "rgb(80,72,229)",
-                            textAlign: "center",
                             textWrap: "nowrap",
-                            minWidth: "120px",
                             minHeight: "50px",
                             borderRadius: "5px",
                             color: "white",
+                            border: "1px solid black",
                           }}
                           data-productobject={location.state.productObject}
                           onClick={handleAddToCart}
@@ -254,14 +271,14 @@ export default function ProductDetailsPage() {
                     </>
                   )}
                 </div>
-                <div style={{ width: "100%" }}>
+                <div style={{ display: "flex", width: "100%" }}>
                   <Button
                     disabled={user.role === "Regular" ? true : false}
                     variant="outlined"
                     style={{
                       textAlign: "center",
-                      minWidth: "120px",
-                      minHeight: "50px",
+                      minWidth: "100px",
+                      height: "50px",
                       borderRadius: "5px",
                       color: "black",
                     }}
@@ -378,6 +395,7 @@ export default function ProductDetailsPage() {
                           height: "30px",
                           minWidth: "40px",
                           width: "100%",
+                          color: "white",
                         }}
                         data-productobject={location.state.productObject}
                         onClick={handleAddToCart}
