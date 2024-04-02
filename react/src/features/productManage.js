@@ -35,6 +35,7 @@ import {
 import {
   setProducts,
   createProduct,
+  fetchProductCount,
   fetchProducts,
   selectProducts,
   updateProduct
@@ -119,6 +120,7 @@ export default function productManage(props) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  
   const [productName, setProductName] = useState(location.state?location.state.product.productName:"")
   const [productDescription, setProductDescription]= useState(location.state?location.state.product.description:"")
   const [productCategory, setProductCategory]= useState(location.state?location.state.product.category:"")
@@ -135,6 +137,9 @@ export default function productManage(props) {
     imageLinkError: "",
     quantityError: "",
   });
+  const handleDelete = ()=>{
+
+  }
  const handleProductCreation = ()=>
  {
   let errorObj={
@@ -205,14 +210,24 @@ export default function productManage(props) {
     quantity: productQuantity
   };
   location.state? 
-  dispatch( updateProduct({product: productObj,id : location.state.product._id})).then(()=>{
+  dispatch( updateProduct({product: productObj,id : location.state.product._id})).then((res)=>{
+ 
     alert("product updated!")
     navigate("/")
   })
   
-  : dispatch(createProduct(productObj)).then(()=>{
+  : dispatch(createProduct(productObj)).then((res)=>{
+    
+    console.log(res)
+    if(res.error)
+    { 
+      alert( res.error.message) 
+    }
+    else
+    {
     alert("product created!")
     navigate("/")
+    }
   })
   
  }
@@ -268,6 +283,7 @@ console.log(location.state)
     {
       dispatch(fetchUser()); 
       dispatch(fetchProducts());
+      dispatch(fetchProductCount());
     }
  
    
@@ -487,8 +503,8 @@ console.log(location.state)
               </FormControl>
               <Button variant="contained" fullWidth onClick={handleProductCreation}>
               {location.state ?"Update Product" : "Add Product"}
-           
               </Button>
+              {location.state? <Button>delete Product</Button> :""}
             </Box>
           </form>
         </div>

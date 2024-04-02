@@ -100,6 +100,7 @@ const defaultState = {
   totalPrice: 0,
   role: "Regular",
   },
+  currentPage:1,
   displayUser:"none",
   displayCart:"none",
   cartMerged: false,
@@ -120,6 +121,9 @@ export const userSlice = createSlice({
       state.user.totalPrice = action.payload.shoppingCart.reduce((currentPrice, product) => {
         return currentPrice + Number(product.price);
       }, 0);
+    },
+    setCurrentPage:(state,action) =>{
+      state.currentPage = action.payload
     },
     setCartMerge: (state, action) => {
       state.cartMerged = false
@@ -192,7 +196,7 @@ export const userSlice = createSlice({
   }
 });
 
-export const { setUser, setCart,setDisplayUser,setCartMerge ,setDisplayCart} = userSlice.actions;
+export const { setUser, setCart,setDisplayUser,setCartMerge ,setDisplayCart,setCurrentPage} = userSlice.actions;
 
 
 // The function below is called a selector and allows us to select a value from
@@ -207,4 +211,5 @@ export const selectDisplayUser = (state) => state.user.displayUser;
 export const selectDisplayCart = (state) => state.user.displayCart;
 export const selectWholeUser = (state) => state;
 export const selectCartMerged = (state) => state.user.cartMerged
+export const selectCurrentPage = (state) => state.user.currentPage
 export default userSlice.reducer;

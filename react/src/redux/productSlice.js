@@ -1,5 +1,26 @@
 import { createSlice,createAsyncThunk  } from "@reduxjs/toolkit";
+export const fetchProductCount = createAsyncThunk('product/fetchProductCount', async () => {
 
+  const token = localStorage.getItem("token");
+  const response = await fetch("http://localhost:4000/product/count",{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json;charset=UTF-8',
+  },
+    mode:'cors',
+    cache:'default'
+  }) .then((response) =>
+  {
+    if(response.ok) {
+      return response.json()
+    }
+    else
+    {
+      return response.text().then(text => { throw new Error(text) });
+    }
+  }) 
+  return response;
+})
 export const fetchProducts = createAsyncThunk('product/fetchProducts', async (parameters) => {
 
   const url = (parameters) ? ("http://localhost:4000/product"+"?page=" + parameters.page +"&limit= " + parameters.limit) : "http://localhost:4000/product"
@@ -18,7 +39,7 @@ export const fetchProducts = createAsyncThunk('product/fetchProducts', async (pa
 })
 export const updateProduct = createAsyncThunk('product/updateProduct', async ({product,id}) => {
   const token = localStorage.getItem("token");
-  const response = fetch("http://localhost:4000/product/"+id,{
+  const response = await fetch("http://localhost:4000/product/"+id,{
     method:'PUT',
     headers:{
       'Authorization' : `Bearer ${token}`,
@@ -41,7 +62,7 @@ export const updateProduct = createAsyncThunk('product/updateProduct', async ({p
 })
 export const createProduct = createAsyncThunk('product/createProduct', async (product) => {
   const token = localStorage.getItem("token");
-  const response = fetch("http://localhost:4000/product",{
+  const response = await fetch("http://localhost:4000/product",{
     method:'POST',
     headers:{
       'Authorization' : `Bearer ${token}`,
@@ -66,6 +87,7 @@ export const createProduct = createAsyncThunk('product/createProduct', async (pr
 export const productSlice = createSlice({
   name: "product",
   initialState: {
+    count: 0,
     products: []
   },
   reducers: {
@@ -113,6 +135,7 @@ export const productSlice = createSlice({
         state.error = action.error.message
         console.log('creat products failed:')
         console.log(action.error.message)
+        
       }).addCase(updateProduct.pending, (state, action) => {
         state.status = 'loading'
         console.log('updating products')
@@ -129,7 +152,25 @@ export const productSlice = createSlice({
         state.error = action.error.message
         console.log( 'update products failed:')
         console.log(action.error.message)
-      })
+      }).addCase(fetchProductCount.pending, (state, action) => {
+      state.status = 'loading'
+      console.log('fetching product count')
+    })
+    .addCase(fetchProductCount.fulfilled, (state, action) => {
+      state.status = 'succeeded'  
+     
+      console.log('fetch product count succeed:')   
+      console.log(action)   
+      state.count = action.payload
+      // Add any fetched posts to the array
+     
+    })
+    .addCase(fetchProductCount.rejected, (state, action) => {
+      state.status = 'failed'
+      state.error = action.error.message
+      console.log( 'fetch product count failed:')
+      console.log(action.error.message)
+    })
   }
 });
 
@@ -150,4 +191,5 @@ const incrementAsync = (amount) => (dispatch) => {
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state) => state.counter.value)`
 export const selectProducts = (state) => state.product.products;
+export const selectProductCount = (state) => state.product.count
 export default productSlice.reducer;

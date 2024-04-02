@@ -37,11 +37,23 @@ const getOneUser = async (req, res) => {
     })
  
     Promise.all(cartPromises).then((shoppingCart)=>{
-   
+      let validProducts = shoppingCart.filter(product => !!product)  
       let obj = {...(user._doc)}
-      obj.shoppingCart = shoppingCart
-   
-      res.status(200).json(obj);
+      
+      if(validProducts.length !== shoppingCart.length)
+      {
+        obj.shoppingCart = validProducts 
+        console.log("find deleted product, update user")
+        User.findByIdAndUpdate(req.id, obj).then(()=>res.status(200).json(obj))
+      } 
+      else
+      {
+        obj.shoppingCart = validProducts 
+        res.status(200).json(obj);
+      }
+    
+     
+      
     })
    
   } catch (err) {

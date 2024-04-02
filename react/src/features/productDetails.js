@@ -26,6 +26,7 @@ import {
 import {
   setProducts,
   createProduct,
+  fetchProductCount,
   fetchProducts,
   selectProducts,
 } from "../redux/productSlice";
@@ -95,6 +96,7 @@ export default function ProductDetailsPage() {
     if (user.userName === null) {
       dispatch(fetchUser());
       dispatch(fetchProducts());
+      dispatch(fetchProductCount());
     }
   }, []);
   if (matches) {

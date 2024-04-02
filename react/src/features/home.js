@@ -23,11 +23,15 @@ import {
   selectDisplayCart,
   setDisplayUser,
   setDisplayCart,
-  selectWholeUser
+  selectWholeUser,
+  setCurrentPage,
+  selectCurrentPage
 } from "../redux/userSlice";
 import {
   setProducts,
   createProduct,
+  selectProductCount,
+  fetchProductCount,
   fetchProducts,
   selectProducts,
 } from "../redux/productSlice";
@@ -48,8 +52,10 @@ export default function Home() {
   const displayUser =  useSelector(selectDisplayUser)
   const displayCart =  useSelector(selectDisplayCart)
   const cartMerged =  useSelector(selectCartMerged)
-
+  const currentPage = useSelector(selectCurrentPage)
   const whole =  useSelector(selectWholeUser)
+  const productCount = useSelector(selectProductCount)
+  const pageLimit =  10;
   const sortOption = [
     {
       value: "LastAdded",
@@ -68,7 +74,9 @@ export default function Home() {
   const dispatch = useDispatch();
   const handlePageChange = (e,v)=>
   {
-    dispatch(fetchProducts({limit:10,page:v}))
+  
+    dispatch(setCurrentPage(v))
+    dispatch(fetchProducts({limit:pageLimit,page:v}))
   }
   const handleSort = (e) =>{
     let sort = e.target.value;
@@ -155,7 +163,8 @@ export default function Home() {
   }
 
   useEffect(() => {
-    dispatch(fetchProducts());
+    dispatch(fetchProductCount());
+    dispatch(fetchProducts({limit:pageLimit,page:currentPage}));
     if(user.userName === null && user.shoppingCart.length !== 0)
     {
         console.log("shopping cart need to merge")
@@ -282,7 +291,9 @@ export default function Home() {
       <Pagination
     
         onChange = {handlePageChange}
-        count={10}
+        boundaryCount = {0}
+        count={Math.ceil(productCount/pageLimit)}
+        page={currentPage}
         variant="outlined"
         shape="rounded"
         sx={{marginRight:"20px", display : "flex", justifyContent:"flex-end"}}

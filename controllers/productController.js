@@ -11,7 +11,15 @@ const User = require("../models/userModel");
 //     res.status(500).json({ message: "Error on getting all products" });
 //   }
 // };
-
+const getProductCount = async (req, res)=>{
+  try {
+    const count = await Product.count();
+    res.status(200).json(count);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Error on getting the product" + err.message });
+  }
+}
 const getOneProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params?.id);
@@ -118,6 +126,7 @@ const getProducts = async (req, res) => {
 
 module.exports = {
   // getAllProducts,
+  getProductCount,
   getOneProduct,
   createProduct,
   updateProduct,
