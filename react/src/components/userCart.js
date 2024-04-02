@@ -213,7 +213,7 @@ export default function UserCart(props) {
             htmlFor="bootstrap-input"
             style={{ paddingTop: "10px" }}
           >
-            Apply discount Cupon
+            Apply discount Coupon
           </InputLabel>
           <BootstrapInput
             id="outlined-adornment-password"
