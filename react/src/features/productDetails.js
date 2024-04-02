@@ -298,7 +298,7 @@ export default function ProductDetailsPage() {
   } else {
     return (
       <>
-       <h2> Product Details</h2>
+        <h2> Product Details</h2>
         <Card
           sx={{
             width: "95%",
@@ -333,7 +333,16 @@ export default function ProductDetailsPage() {
               {location.state.productObject.productName}
             </Typography>
             <Typography variant="h5" component="p">
-            <span>${location.state.price} {Number(location.state.quantity) <= Number(onCart)? (<span style={{backgroundColor: "pink", color: "red"}}>Out of Stock</span>): ""}</span>
+              <span>
+                ${location.state.price}{" "}
+                {Number(location.state.quantity) <= Number(onCart) ? (
+                  <span style={{ backgroundColor: "pink", color: "red" }}>
+                    Out of Stock
+                  </span>
+                ) : (
+                  ""
+                )}
+              </span>
             </Typography>
             <Typography variant="body1" component="p">
               {location.state.productObject.description}

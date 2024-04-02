@@ -22,7 +22,6 @@ export default function Product(props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleAddToCart = (e) => {
-  
     if (Number(props.productObject.quantity) <= Number(props.onCart)) {
       alert(props.productObject.productName + " out of stock!");
       return;
@@ -31,16 +30,12 @@ export default function Product(props) {
       ...user,
       shoppingCart: [...cart, props.productObject],
     };
-    if(user.userName === null)
-    {
-      dispatch(setUser(userObj)) 
-
-    }
-    else{
-
+    if (user.userName === null) {
+      dispatch(setUser(userObj));
+    } else {
       dispatch(updateUser(userObj));
     }
-  
+
     console.log("handleAddToCart()");
   };
   const handleRemoveFromCart = (e) => {
@@ -48,7 +43,7 @@ export default function Product(props) {
     for (let index in array) {
       if (array[index]._id === props.productObject._id) {
         array.splice(index, 1);
-        
+
         break;
       }
     }
@@ -58,17 +53,12 @@ export default function Product(props) {
       shoppingCart: [...array],
     };
 
-    if(user.userName === null)
-    {
-      dispatch(setUser(userObj)) 
-
-    }
-    else{
-
+    if (user.userName === null) {
+      dispatch(setUser(userObj));
+    } else {
       dispatch(updateUser(userObj));
     }
-   
-  
+
     console.log("handleRemoveFromCart()");
   };
   const handleEditProduct = (e) => {
@@ -98,20 +88,58 @@ export default function Product(props) {
   };
 
   return (
-    <Card sx={{ padding: "15px", border: "1px solid rgb(200,200,200)" }}>
+    <Card
+      sx={{
+        padding: "15px",
+        border: "1px solid rgb(200,200,200)",
+        cursor: "point",
+      }}
+    >
       <CardMedia
         onClick={handleProductDetail}
-        sx={{ height: props.imageHeight ? props.imageHeight: 180, borderRadius: "5px" }}
+        sx={{
+          height: props.imageHeight ? props.imageHeight : 180,
+          borderRadius: "5px",
+        }}
         image={props.productObject.imageLink}
         title={props.productName}
+        style={{ cursor: "pointer" }}
       />
 
-      <div style={{ textAlign: "left",overflowY:"auto"}}>
-        <Typography variant="body2" color="text.secondary" style={{whiteSpace:"nowrap",maxWidth: props.imageHeight ? props.imageHeight: 180}}>
-          <span>{props.productObject.productName}</span> 
+      <div style={{ textAlign: "left", overflowY: "auto" }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          style={{
+            whiteSpace: "nowrap",
+            maxWidth: props.imageHeight ? props.imageHeight : 180,
+          }}
+        >
+          <span>{props.productObject.productName}</span>
         </Typography>
-        <Typography variant="body2" component="p" style={{whiteSpace:"nowrap"}}>
-        <span> ${props.productObject.price}{Number(props.productObject.quantity) <= Number(props.onCart)? (<span style={{backgroundColor: "pink", color: "red", borderRadius:"2.5px",marginLeft:"10px"}}>Out of Stock</span>): ""} </span> 
+        <Typography
+          variant="body2"
+          component="p"
+          style={{ whiteSpace: "nowrap" }}
+        >
+          <span>
+            {" "}
+            ${props.productObject.price}
+            {Number(props.productObject.quantity) <= Number(props.onCart) ? (
+              <span
+                style={{
+                  backgroundColor: "pink",
+                  color: "red",
+                  borderRadius: "2.5px",
+                  marginLeft: "10px",
+                }}
+              >
+                Out of Stock
+              </span>
+            ) : (
+              ""
+            )}{" "}
+          </span>
         </Typography>
 
         <div
@@ -132,10 +160,7 @@ export default function Product(props) {
               width: "100%",
             }}
           >
-           
-            {
-       
-            props.onCart ? (
+            {props.onCart ? (
               <>
                 <Button
                   data-productobject={props.productObject}
@@ -163,7 +188,6 @@ export default function Product(props) {
               </>
             ) : (
               <>
-                
                 <div style={{ width: "100%" }}>
                   <Button
                     variant="outlined"

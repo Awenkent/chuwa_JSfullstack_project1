@@ -123,7 +123,7 @@ export default function UserCart(props) {
 
         <div>
           <div
-            style={{ color: "white" }}
+            style={{ color: "white", cursor: "pointer" }}
             onClick={() => {
               props.handleClick();
             }}
