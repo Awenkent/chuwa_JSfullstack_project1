@@ -220,6 +220,7 @@ export default function UserCart(props) {
             style={{ marginTop: "30px" }}
             size="small"
             inputRef={cuponRef}
+            placeholder="Enter coupon code"
             endAdornment={
               <InputAdornment position="end">
                 <Button
