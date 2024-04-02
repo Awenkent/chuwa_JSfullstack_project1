@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Wrapper, StyledButton } from "./cartApp.styles";
 import { selectProducts } from "../redux/productSlice";
 import Cart from "./cart";
-import "./styles.css";
+import "../styles/cartApp.styles";
 import {
   setCart,
   selectCart,

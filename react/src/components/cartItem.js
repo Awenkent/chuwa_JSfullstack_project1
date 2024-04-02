@@ -1,5 +1,5 @@
 import { Button } from "@material-ui/core";
-import { Wrapper } from "./cartItem.styles.js"; // Assuming cartItem.styles.js is the JavaScript counterpart
+import { Wrapper } from "../styles/cartItem.styles"; // Assuming cartItem.styles.js is the JavaScript counterpart
 
 const CartItem = ({ item, addToCart, removeFromCart }) => {
   return (
