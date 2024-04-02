@@ -159,7 +159,7 @@ export default function UserCart(props)
         <div style={{display:"flex", flex : 1,flexDirection:"column", justifyContent:"space-between", whiteSpace:"nowrap",overflowY:"auto"}}>
             <div>
          <h3>{product.productName}</h3>
-         <h3 style={{color:"rgb(80,72,229)"}}>Price: {product.price * map.get(product._id)}</h3>
+         <h3 style={{color:"rgb(80,72,229)"}}>Price: ${product.price * map.get(product._id)}</h3>
          </div>    
          <Button onClick={()=>{handleRemoveItem(product._id)}}>Remove</Button>
         </div>

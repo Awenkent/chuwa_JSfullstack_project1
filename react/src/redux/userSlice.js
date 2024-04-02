@@ -31,7 +31,7 @@ export const fetchUser = createAsyncThunk('user/fetchUsers', async (defaultUser)
           }
         }) .catch(error => {
               console.log("The error is: " + error);
-              throw new Error("Connection failed")
+              throw new Error("fetchUser Connection failed")
              // alert("Your session is ended, please login again.");
          });
         
@@ -79,7 +79,7 @@ export const updateUser = createAsyncThunk('product/updateUser', async (user) =>
     }
   }) .catch(error => {
         console.log("The error is: " + error);
-        throw new Error("Connection failed")
+        throw new Error("updateUser Connection failed")
        // alert("Your session is ended, please login again.");
    });
 

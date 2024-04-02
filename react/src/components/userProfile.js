@@ -32,7 +32,7 @@ export default function UserProfile(props)
       }}
     >
     <p>currentUser: {props?.userName}</p>
-        <p>{"total:" + props?.totalPrice}</p>
+        <p>{"total:$" + (props?.totalPrice).toFixed(2)}</p>
         <p>role: {props?.role}</p>
       <Button onClick={props.handleChangePssword}>Change Password</Button>
     </div>

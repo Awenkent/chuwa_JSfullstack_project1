@@ -83,7 +83,29 @@ export const createProduct = createAsyncThunk('product/createProduct', async (pr
   }) 
   return response;
 })
+export const deleteProducts = createAsyncThunk('product/deleteProducts', async (id) => {
 
+  const token = localStorage.getItem("token");
+  const response = await fetch("http://localhost:4000/product/"+id,{
+    method:'DELETE',
+    headers:{
+      'Authorization' : `Bearer ${token}`,
+      'Content-Type':'application/json;charset=UTF-8',
+  },
+  mode:'cors',
+  cache:'default'})
+  .then((response) => 
+  {
+    if(response.ok) {
+      return response.json()
+    }
+    else
+    {
+      return response.text().then(text => { throw new Error(text) });
+    }
+  })
+  return response;
+})
 export const productSlice = createSlice({
   name: "product",
   initialState: {
@@ -152,7 +174,8 @@ export const productSlice = createSlice({
         state.error = action.error.message
         console.log( 'update products failed:')
         console.log(action.error.message)
-      }).addCase(fetchProductCount.pending, (state, action) => {
+      })
+      .addCase(fetchProductCount.pending, (state, action) => {
       state.status = 'loading'
       console.log('fetching product count')
     })
@@ -169,6 +192,25 @@ export const productSlice = createSlice({
       state.status = 'failed'
       state.error = action.error.message
       console.log( 'fetch product count failed:')
+      console.log(action.error.message)
+    })
+    .addCase(deleteProducts.pending, (state, action) => {
+      state.status = 'loading'
+      console.log('deleting product')
+    })
+    .addCase(deleteProducts.fulfilled, (state, action) => {
+      state.status = 'succeeded'  
+     
+      console.log('delete product succeed:')   
+      console.log(action)   
+      state.count = action.payload
+      // Add any fetched posts to the array
+     
+    })
+    .addCase(deleteProducts.rejected, (state, action) => {
+      state.status = 'failed'
+      state.error = action.error.message
+      console.log( 'delete product failed:')
       console.log(action.error.message)
     })
   }
