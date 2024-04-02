@@ -34,6 +34,7 @@ import {
 } from "../redux/userSlice";
 import {
   setProducts,
+  deleteProducts,
   createProduct,
   fetchProductCount,
   fetchProducts,
@@ -138,7 +139,17 @@ export default function productManage(props) {
     quantityError: "",
   });
   const handleDelete = ()=>{
-
+    dispatch(deleteProducts(location.state.product._id)).then((res)=>{
+      if(res.error)
+      { 
+        alert( res.error.message) 
+      }
+      else
+      {
+        alert("product deleted!")
+        navigate("/")
+      }
+    })  
   }
  const handleProductCreation = ()=>
  {
@@ -211,9 +222,16 @@ export default function productManage(props) {
   };
   location.state? 
   dispatch( updateProduct({product: productObj,id : location.state.product._id})).then((res)=>{
- 
-    alert("product updated!")
-    navigate("/")
+    if(res.error)
+    { 
+      alert( res.error.message) 
+    }
+    else
+    {
+      alert("product updated!")
+      navigate("/")
+    }
+    
   })
   
   : dispatch(createProduct(productObj)).then((res)=>{
@@ -407,6 +425,7 @@ console.log(location.state)
               <Button variant="contained" fullWidth onClick={handleProductCreation}>
                    {location.state ?"Update Product" : "Add Product"}
               </Button>
+              {location.state? <Button onClick={handleDelete}>delete Product</Button> :""}
             </Box>
           </div>
         </div>
@@ -504,7 +523,7 @@ console.log(location.state)
               <Button variant="contained" fullWidth onClick={handleProductCreation}>
               {location.state ?"Update Product" : "Add Product"}
               </Button>
-              {location.state? <Button>delete Product</Button> :""}
+              {location.state? <Button onClick={handleDelete}>delete Product</Button> :""}
             </Box>
           </form>
         </div>

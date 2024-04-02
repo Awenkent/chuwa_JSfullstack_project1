@@ -76,7 +76,12 @@ export default function Home() {
   {
   
     dispatch(setCurrentPage(v))
-    dispatch(fetchProducts({limit:pageLimit,page:v}))
+    dispatch(fetchProducts({limit:pageLimit,page:v})).then((res)=>{
+      if(res.error)
+      { 
+        alert( res.error.message) 
+      }
+    })  
   }
   const handleSort = (e) =>{
     let sort = e.target.value;
@@ -158,13 +163,28 @@ export default function Home() {
   if(cartMerged)
   {
     console.log("doMerge")
-    dispatch(updateUser(user))
+    dispatch(updateUser(user)).then((res)=>{
+      if(res.error)
+      { 
+        alert( res.error.message) 
+      }
+    })  
     dispatch(setCartMerge())
   }
 
   useEffect(() => {
-    dispatch(fetchProductCount());
-    dispatch(fetchProducts({limit:pageLimit,page:currentPage}));
+    dispatch(fetchProductCount()).then((res)=>{
+      if(res.error)
+      { 
+        alert( res.error.message) 
+      }
+    });
+    dispatch(fetchProducts({limit:pageLimit,page:currentPage})).then((res)=>{
+      if(res.error)
+      { 
+        alert( res.error.message) 
+      }
+    });
     if(user.userName === null && user.shoppingCart.length !== 0)
     {
         console.log("shopping cart need to merge")
@@ -172,7 +192,12 @@ export default function Home() {
     }
     else
     {
-      dispatch(fetchUser()); 
+      dispatch(fetchUser()).then((res)=>{
+        if(res.error)
+        { 
+          alert( res.error.message) 
+        }
+      }); 
     }
    
   }, []);
@@ -269,6 +294,7 @@ export default function Home() {
       </div>
          
       <div style={gridStyle}>
+       
         {products?.map((product, index) => (
           <Product
           
