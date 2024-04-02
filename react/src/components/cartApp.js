@@ -2,25 +2,35 @@ import React, { useState, useEffect } from "react";
 import { Badge, Drawer, Grid, LinearProgress } from "@material-ui/core";
 import { AddShoppingCart } from "@material-ui/icons";
 import { useSelector, useDispatch } from "react-redux";
-import { Wrapper, StyledButton } from "./cartApp.styles";
+import { Wrapper, StyledButton } from "../styles/cartApp.styles";
 import { selectProducts } from "../redux/productSlice";
 import Cart from "./cart";
-import "../styles/cartApp.styles";
 import {
   setCart,
   selectCart,
   updateUser,
   selectUser,
+  setDisplayCart,
+  selectDisplayCart
 } from "../redux/userSlice";
 
 const CartApp = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
-
+  
+  const cartOn= useSelector(selectDisplayCart);
   const cart = useSelector(selectCart);
   const user = useSelector(selectUser);
   const Products= useSelector(selectProducts);
   const dispatch = useDispatch();
+
+  useEffect(()=>{
+    if(cartOn === "none"){
+      setCartOpen(true);
+    }else{
+      setCartOpen(false);
+    }
+  },[cartOn]);
   
   useEffect(()=>{
     const newCartItems = Object.values(
@@ -129,6 +139,38 @@ const CartApp = () => {
 
   };
 
+  const handleRemoveAllFromCart = (id) => {
+    setCartItems((prev) =>
+      prev.reduce((acc, item) => {
+        if (item.id === id) {
+          return acc;
+        } else {
+          return [...acc, item];
+        }
+      }, [])
+    );
+    let array = [...cart];
+    for (let index in array)
+    {
+      if(array[index]._id === id)
+      {
+        array.splice(index,1);
+        dispatch(setCart(array));
+      }
+    }
+
+    let userObj = {
+      ...user,
+      shoppingCart : [...array]
+    }
+   
+    dispatch(updateUser(userObj))
+    console.log("handleRemoveFromCart()")
+
+  };
+
+
+
   return (
     
       <Wrapper>
@@ -141,6 +183,7 @@ const CartApp = () => {
             cartItems={cartItems}
             addToCart={handleAddToCart}
             removeFromCart={handleRemoveFromCart}
+            removeAllFromCart={handleRemoveAllFromCart}
           />
         </Drawer>
 
@@ -149,6 +192,8 @@ const CartApp = () => {
             <AddShoppingCart />
           </Badge>
         </StyledButton>
+
+        
       </Wrapper>
     
   );

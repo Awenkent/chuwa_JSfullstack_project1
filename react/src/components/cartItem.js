@@ -1,7 +1,7 @@
-import { Button } from "@material-ui/core";
-import { Wrapper } from "../styles/cartItem.styles"; // Assuming cartItem.styles.js is the JavaScript counterpart
+import { Button, Link } from "@material-ui/core";
+import { Wrapper } from "../styles/cartItem.styles"; 
 
-const CartItem = ({ item, addToCart, removeFromCart }) => {
+const CartItem = ({ item, addToCart, removeFromCart, removeAllLink }) => {
   return (
     <Wrapper>
       <div>
@@ -29,6 +29,9 @@ const CartItem = ({ item, addToCart, removeFromCart }) => {
             +
           </Button>
         </div>
+        {removeAllLink && (
+          <Link onClick={() => removeAllLink(item.id)}>Remove the product</Link>
+        )}
       </div>
       <img src={item.imageLink} alt={item.productName} />
     </Wrapper>
@@ -36,3 +39,4 @@ const CartItem = ({ item, addToCart, removeFromCart }) => {
 };
 
 export default CartItem;
+
