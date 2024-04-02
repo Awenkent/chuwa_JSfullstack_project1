@@ -11,6 +11,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useNavigate } from "react-router-dom";
+import { CartApp } from "./cartApp";
 
 import {
   setUser,
@@ -113,7 +114,7 @@ export default function Header(props) {
             flex: 1,
             display: "flex",
             justifyContent: "center",
-            alignItems: "flex-end",
+            alignItems: "center",
             flexWrap: "nowrap",
           }}
         >
@@ -132,11 +133,12 @@ export default function Header(props) {
           }
            {user.shoppingCart.length !== 0 ?
            (  <span className="notification">
-           <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
-           <span className="badge">{user.shoppingCart.length}</span>
+           {/* <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/> */}
+           <CartApp className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
+           {/* <span className="badge">{user.shoppingCart.length}</span> */}
          </span>)
            :
-           (  <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
+           (<CartApp className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
           }
         
           <a style={{ margin: "0 10px" }}> ${totalPrice.toFixed(2)}</a>
@@ -168,7 +170,7 @@ export default function Header(props) {
             flex: 1,
             display: "flex",
             justifyContent: "center",
-            alignItems: "flex-end",
+            alignItems: "center",
             flexWrap: "nowrap",
           }}
         >
@@ -187,11 +189,12 @@ export default function Header(props) {
           }
            {user.shoppingCart.length !== 0 ?
            (  <span className="notification">
-           <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
-           <span className="badge">{user.shoppingCart.length}</span>
+           {/* <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
+           <span className="badge">{user.shoppingCart.length}</span> */}
+           <CartApp className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>
          </span>)
            :
-           (  <ShoppingCartOutlinedIcon className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/>)
+           ( <CartApp className="icon clickable" fontSize="medium" onClick={handleDisplayCart}/> )
           }
         
           <a style={{ margin: "0 10px" }}> {"$" + totalPrice.toFixed(2)}</a>

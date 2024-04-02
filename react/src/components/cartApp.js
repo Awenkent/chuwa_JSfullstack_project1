@@ -187,7 +187,7 @@ const CartApp = () => {
           />
         </Drawer>
 
-        <StyledButton onClick={() => setCartOpen(true)}>
+        <StyledButton style={{color: "white"}} onClick={() => setCartOpen(true)}>
           <Badge badgeContent={getTotalItems(cartItems)} color="error">
             <AddShoppingCart />
           </Badge>

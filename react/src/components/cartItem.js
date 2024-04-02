@@ -12,6 +12,7 @@ const CartItem = ({ item, addToCart, removeFromCart, removeAllLink }) => {
         </div>
         <div className="buttons">
           <Button
+            color="primary"
             size="small"
             disableElevation
             variant="contained"
@@ -21,6 +22,7 @@ const CartItem = ({ item, addToCart, removeFromCart, removeAllLink }) => {
           </Button>
           <p>{item.amount}</p>
           <Button
+            color="primary"
             size="small"
             disableElevation
             variant="contained"
