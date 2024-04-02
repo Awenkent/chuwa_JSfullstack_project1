@@ -326,6 +326,9 @@ export default function ProductDetailsPage() {
           />
 
           <div style={{ textAlign: "left" }}>
+            <Typography variant="bold" color="text.secondary">
+              {location.state.productObject.category}
+            </Typography>
             <Typography variant="h4" color="text.secondary">
               {location.state.productObject.productName}
             </Typography>
