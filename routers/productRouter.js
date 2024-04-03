@@ -10,7 +10,7 @@ const {
   deleteProduct,
   getProducts,
 } = require("../controllers/productController");
-router.post("/count",getProductCount)
+router.post("/count", getProductCount);
 router.get("/", getProducts);
 router.post("/", auth, createProduct);
 router.get("/:id", getOneProduct);

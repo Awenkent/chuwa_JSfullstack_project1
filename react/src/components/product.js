@@ -91,7 +91,7 @@ export default function Product(props) {
     <Card
       sx={{
         padding: "15px",
-        border: "1px solid rgb(200,200,200)",
+        //border: "1px solid rgb(200,200,200)",
         cursor: "point",
       }}
     >
